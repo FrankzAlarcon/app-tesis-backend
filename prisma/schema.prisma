@@ -1,0 +1,182 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Auth {
+  id        String @id @default(uuid())
+  password  String
+  token     String?
+
+  user      User?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("auth")
+}
+
+
+model User {
+  id        String @id @default(uuid())
+  email     String @unique
+  name      String
+
+  roles     Role @relation(fields: [roleId], references: [id])
+  roleId    String @map("role_id")
+
+  auth      Auth @relation(fields: [authId], references: [id])
+  authId    String @unique @map("auth_id")
+
+  student   Student?
+  business  Business?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+  
+  @@index([email], name: "email_index")
+}
+
+model Role {
+  id        String @id @default(uuid())
+  name      String
+
+  users     User[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("roles")
+}
+
+model Student {
+  id        String @id @default(uuid())
+  faculty   String
+  ira       String 
+
+  user      User @relation(fields: [userId], references: [id])
+  userId    String @unique @map("user_id")
+
+  contracts Contract[]
+  studentForms StudenForm[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("students")
+}
+
+model Business {
+  id        String @id @default(uuid())
+  name      String
+  code      String
+  hasCovenant     Boolean @map("has_covenant")
+
+  user      User @relation(fields: [userId], references: [id])
+  userId    String @unique @map("user_id")
+
+  businessCovenants BusinessCovenant?
+
+  contracts Contract[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("businesses")
+}
+
+model Covenant {
+  id        String @id @default(uuid())
+  name      String?
+  description String?
+  type     String
+
+  businessCovenants BusinessCovenant[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("covenants")
+}
+
+model BusinessCovenant {
+  id        String @id @default(uuid())
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+
+  business  Business @relation(fields: [businessId], references: [id])
+  businessId String @unique @map("business_id")
+
+  covenant  Covenant @relation(fields: [covenantId], references: [id])
+  covenantId String @map("covenant_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("business_covenants")
+}
+
+model Contract {
+  id        String @id @default(uuid())
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+  practiceType String @map("practice_type")
+  remuneration Decimal
+
+  business  Business @relation(fields: [businessId], references: [id])
+  businessId String @unique @map("business_id")
+
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String @unique @map("student_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("contracts")
+}
+
+model Form {
+  id        String @id @default(uuid())
+  name      String?
+  description String?
+  code     String
+  status   String
+
+  studentForms StudenForm[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("forms")
+}
+
+model StudenForm {
+  id        String @id @default(uuid())
+  startDate DateTime @map("start_date")
+  approvalDate DateTime @map("approval_date")
+  url       String
+
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String @unique @map("student_id")
+
+  form      Form @relation(fields: [formId], references: [id])
+  formId    String @unique @map("form_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("student_forms")
+}
+
