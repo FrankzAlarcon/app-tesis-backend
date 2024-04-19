@@ -13,19 +13,38 @@ export class S3Service {
     @Inject(config.KEY) private readonly configService: ConfigType<typeof config>
   ) {}
 
-  async getObject(filename: string, bucket?: string) {
+  async getPendingObject(filename: string, bucket?: string) {
     return this.s3Service.send(
       new GetObjectCommand({
-        Bucket: bucket ?? this.configService.aws.bucket,
+        Bucket: bucket ?? this.configService.aws.pendingBucket,
         Key: filename
       })
     )
   }
 
-  async uploadObject(filename: string, file: Buffer, bucket?: string) {
+  async getApprovedObject(filename: string, bucket?: string) {
+    return this.s3Service.send(
+      new GetObjectCommand({
+        Bucket: bucket ?? this.configService.aws.approvedBucket,
+        Key: filename
+      })
+    )
+  }
+
+  async uploadPendingObject(filename: string, file: Buffer, bucket?: string) {
     return await this.s3Service.send(
       new PutObjectCommand({
-        Bucket: bucket ?? this.configService.aws.bucket,
+        Bucket: bucket ?? this.configService.aws.pendingBucket,
+        Key: filename,
+        Body: file
+      })
+    )
+  }
+
+  async uploadApprovedObject(filename: string, file: Buffer, bucket?: string) {
+    return await this.s3Service.send(
+      new PutObjectCommand({
+        Bucket: bucket ?? this.configService.aws.approvedBucket,
         Key: filename,
         Body: file
       })

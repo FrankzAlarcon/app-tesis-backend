@@ -17,6 +17,8 @@ COPY . .
 # COPY .env .env.development ./
 # COPY .env ./
 
+RUN npx prisma generate
+
 # Creates a "dist" folder with the production build
 RUN npm run build
 

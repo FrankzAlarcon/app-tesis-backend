@@ -1,5 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsNotEmpty, IsString } from "class-validator"
+import { ArrayMinSize, IsArray, IsNotEmpty, IsString } from "class-validator"
+
+export class GetStudentInfoByFormDto {
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayMinSize(1)
+  studentFormIds: string[]
+}
 
 export class CreateFormDto {
   @IsString()
