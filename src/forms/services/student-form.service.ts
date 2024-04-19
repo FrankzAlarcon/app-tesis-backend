@@ -6,13 +6,20 @@ import { UploadStudentFormDto } from '../dtos/student-form.dto';
 import { StudentForm } from '../entities/student-form.entity';
 import { StudentFormStatus } from '@/global/enums/student-forms.enum';
 import { GetStudentInfoByFormDto } from '../dtos/forms.dto';
+import { PaginationService } from '@/database/services/pagination.service';
+import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 
 @Injectable()
 export class StudentFormService {
   constructor(
     private readonly s3Service: S3Service,
-    private readonly prismaService: PrismaService
+    private readonly prismaService: PrismaService,
+    private readonly paginationService: PaginationService
   ) {}
+
+  async getStudentForms(params: PaginationQueryDto) {
+    return await this.paginationService.paginate(this.prismaService.studenForm, params)
+  }
 
   // the userId should be in the jwt
   async getStudentFormInfo(
