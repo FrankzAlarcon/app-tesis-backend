@@ -114,7 +114,7 @@ CREATE TABLE "forms" (
 CREATE TABLE "student_forms" (
     "id" TEXT NOT NULL,
     "start_date" TIMESTAMP(3) NOT NULL,
-    "approval_date" TIMESTAMP(3) NOT NULL,
+    "approval_date" TIMESTAMP(3),
     "url" TEXT NOT NULL,
     "student_id" TEXT NOT NULL,
     "form_id" TEXT NOT NULL,
