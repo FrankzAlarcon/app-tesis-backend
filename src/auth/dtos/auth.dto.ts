@@ -6,3 +6,13 @@ export class CreateAuthDto {
   @IsStrongPassword({ minLength: 8 })
   password: string
 }
+
+export class LoginDto {
+  @IsString()
+  @IsNotEmpty()
+  email: string
+
+  @IsString()
+  @IsNotEmpty()
+  password: string
+}

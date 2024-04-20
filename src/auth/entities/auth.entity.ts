@@ -7,3 +7,13 @@ export class Auth implements AuthEntity {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export class AuthenticatedUser {
+  user: {
+    id: string
+    name: string
+    email: string
+    roleId: string
+  }
+  accessToken: string
+}

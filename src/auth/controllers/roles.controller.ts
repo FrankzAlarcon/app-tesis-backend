@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { RolesService } from '../services/roles.service';
 import { CreateRoleDto } from '../dtos/roles.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@/global/guards/auth.guard';
 
 @ApiTags('Roles')
+@UseGuards(AuthGuard)
 @Controller('roles')
 export class RolesController {
   constructor(

@@ -3,7 +3,7 @@ import { RolesService } from '@/auth/services/roles.service';
 import { PrismaService } from '@/database/services/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateStudentDto } from '../dtos/student.dto';
-import { Roles } from '@/global/enums/roles.enum';
+import { Role } from '@/global/enums/roles.enum';
 
 @Injectable()
 export class StudentsService {
@@ -20,7 +20,7 @@ export class StudentsService {
         password: data.password
       })
       const role = await tx.role.findFirst({
-        where: { name: Roles.STUDENT }
+        where: { name: Role.STUDENT }
       })
 
       if (!role) {

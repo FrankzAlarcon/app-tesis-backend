@@ -7,7 +7,16 @@ export class PaginationService {
     entity: any,
     params: PaginationQueryDto
   ) {
-    const total = await entity.count()
+    let total: number = 0;
+    if (params.filterField && params.filterValue) {
+      total = await entity.count({
+        where: {
+          [params.filterField]: params.filterValue
+        }
+      })
+    } else {
+      total = await entity.count()
+    }
 
     const data = await entity.findMany({
       skip: params.offset,
