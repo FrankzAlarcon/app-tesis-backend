@@ -13,7 +13,6 @@ import { AuthController } from './controllers/auth.controller';
       inject: [config.KEY],
       global: true,
       useFactory: (configService: ConfigType<typeof config>) => {
-        console.log(configService)
         return {
           secret: configService.jwt.secret,
           signOptions: { expiresIn: '1d' }

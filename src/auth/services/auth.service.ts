@@ -1,6 +1,6 @@
 import { PrismaService } from '@/database/services/prisma.service';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { CreateAuthDto, LoginDto } from '../dtos/auth.dto';
+import { CreateAdminDto, CreateAuthDto, LoginDto } from '../dtos/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticatedUser } from '../entities/auth.entity';
@@ -25,7 +25,7 @@ export class AuthService {
   async login (data: LoginDto): Promise<AuthenticatedUser> {
     const user = await this.prismaService.user.findFirst({
       where: { email: data.email },
-      include: { auth: true }
+      include: { auth: true, roles: true }
     })
 
     if (!user) {
@@ -37,7 +37,7 @@ export class AuthService {
     if (!isCorrectPassword) {
       throw new UnauthorizedException('Invalid Credentials')
     }
-
+    console.log(user)
     const payload = {
       sub: user.id,
       name: user.name,
@@ -50,10 +50,38 @@ export class AuthService {
         id: user.id,
         name: user.name,
         email: user.email,
-        roleId: user.roleId
+        role: {
+          id: user.roles.id,
+          name: user.roles.name
+        }
       },
       accessToken: this.jwtService.sign(payload)
     }
+  }
+
+  async registerAdmin(data: CreateAdminDto) {
+    return this.prismaService.$transaction(async (tx) => {
+      const auth = await this.create({
+        password: data.password
+      })
+
+      const role = await tx.role.findFirst({ where: { name: Role.ADMIN }})
+
+      if (!role) {
+        throw new BadRequestException('Role not found')
+      }
+
+      const user = await tx.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          roleId: role.id,
+          authId: auth.id,
+        }
+      })
+
+      return user
+    })
   }
 
   async registerStudent(data: CreateStudentDto) {

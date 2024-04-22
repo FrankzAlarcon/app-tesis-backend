@@ -1,7 +1,10 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { LoginDto } from '../dtos/auth.dto';
+import { CreateAdminDto, LoginDto } from '../dtos/auth.dto';
 import { CreateStudentDto } from '@/users/dtos/student.dto';
+import { AuthGuard } from '@/global/guards/auth.guard';
+import { Roles } from '@/global/decorators/role.decorator';
+import { Role } from '@/global/enums/roles.enum';
 
 @Controller('auth')
 export class AuthController {
@@ -21,6 +24,15 @@ export class AuthController {
   async registerStudent(
     @Body() data: CreateStudentDto
   ) {
-    return this.registerStudent(data)
+    return this.authService.registerStudent(data)
+  }
+
+  @UseGuards(AuthGuard)
+  @Roles(Role.ADMIN)
+  @Post('/register-admin')
+  async registerAdmin(
+    @Body() data: CreateAdminDto
+  ){
+    return this.authService.registerAdmin(data)
   }
 }
