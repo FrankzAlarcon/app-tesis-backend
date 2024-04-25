@@ -1,11 +1,14 @@
 import { PrismaService } from '@/database/services/prisma.service';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAdminDto, CreateAuthDto, LoginDto } from '../dtos/auth.dto';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticatedUser } from '../entities/auth.entity';
 import { CreateStudentDto } from '@/users/dtos/student.dto';
 import { Role } from '@/global/enums/roles.enum';
+import { CreateBusinessDto } from '@/users/dtos/business.dto';
+import { v4 as uuidv4 } from 'uuid';
+
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -116,6 +119,50 @@ export class AuthService {
       })
 
       return student
+    })
+  }
+
+  async registerBusiness(data: CreateBusinessDto) {
+    // TODO: add email validation, and those things
+    const user = await this.prismaService.user.findFirst({
+      where: { email: data.email }
+    })
+
+    if (user) {
+      throw new BadRequestException('Email already used')
+    }
+
+    return this.prismaService.$transaction(async (tx) => {
+      const auth = await this.create({
+        password: data.password
+      })
+      const role = await tx.role.findFirst({
+        where: { name: Role.BUSINESS }
+      })
+
+      if (!role) {
+        throw new BadRequestException('Role not found')
+      }
+
+      const user = await tx.user.create({
+        data: {
+          // this name is the contact name or owner name
+          name: data.name,
+          email: data.email,
+          roleId: role.id,
+          authId: auth.id,
+        }
+      })
+      const business = await tx.business.create({
+        data: {
+          userId: user.id,
+          code: uuidv4(),
+          name: data.businessName,
+          hasCovenant: false
+        }
+      })
+
+      return business
     })
   }
 }

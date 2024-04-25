@@ -5,6 +5,7 @@ import { CreateStudentDto } from '@/users/dtos/student.dto';
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
+import { CreateBusinessDto } from '@/users/dtos/business.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,6 +26,13 @@ export class AuthController {
     @Body() data: CreateStudentDto
   ) {
     return this.authService.registerStudent(data)
+  }
+
+  @Post('/register-business')
+  async registerBusiness(
+    @Body() data: CreateBusinessDto
+  ) {
+    return this.authService.registerBusiness(data)
   }
 
   @UseGuards(AuthGuard)

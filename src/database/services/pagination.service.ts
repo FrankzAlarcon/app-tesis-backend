@@ -5,20 +5,25 @@ import { Injectable } from '@nestjs/common';
 export class PaginationService {
   async paginate(
     entity: any,
-    params: PaginationQueryDto
+    params: PaginationQueryDto,
+    where?: any
   ) {
     let total: number = 0;
     if (params.filterField && params.filterValue) {
       total = await entity.count({
         where: {
+          ...where,
           [params.filterField]: params.filterValue
         }
       })
     } else {
-      total = await entity.count()
+      total = await entity.count({
+        where
+      })
     }
 
     const data = await entity.findMany({
+      where,
       skip: params.offset,
       take: params.limit
     })

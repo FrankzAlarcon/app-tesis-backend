@@ -13,8 +13,16 @@ export class StudentsService {
     private readonly authService: AuthService
   ) {}
 
-  create(data: CreateStudentDto) {
+  async create(data: CreateStudentDto) {
     // TODO: add email validation, and those things
+    const user = await this.prismaService.user.findFirst({
+      where: { email: data.email }
+    })
+
+    if (user) {
+      throw new BadRequestException('Email already used')
+    }
+
     return this.prismaService.$transaction(async (tx) => {
       const auth = await this.authService.create({
         password: data.password

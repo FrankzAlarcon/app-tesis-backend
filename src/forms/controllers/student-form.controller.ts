@@ -23,7 +23,6 @@ export class StudentFormController {
   async getStudentsForms(
     @Query() params: PaginationQueryDto
   ) {
-    console.log('[controller]', params)
     return this.studenFormService.getStudentForms(params)
   }
 

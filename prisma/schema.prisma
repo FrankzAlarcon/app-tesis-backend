@@ -64,8 +64,8 @@ model Role {
 
 model Student {
   id        String @id @default(uuid())
-  faculty   String
-  ira       String 
+  faculty   String?
+  ira       String?
 
   user      User @relation(fields: [userId], references: [id])
   userId    String @unique @map("user_id")
@@ -83,7 +83,11 @@ model Business {
   id        String @id @default(uuid())
   name      String
   code      String
-  hasCovenant     Boolean @map("has_covenant")
+  province  String?
+  city      String?
+  phone     String?
+  description String?
+  hasCovenant     Boolean @map("has_covenant") @default(false)
 
   user      User @relation(fields: [userId], references: [id])
   userId    String @unique @map("user_id")
@@ -102,7 +106,7 @@ model Covenant {
   id        String @id @default(uuid())
   name      String?
   description String?
-  type     String
+  type     String @unique
 
   businessCovenants BusinessCovenant[]
 
@@ -112,6 +116,7 @@ model Covenant {
   @@map("covenants")
 }
 
+// TODO: add fields to store the covenant's data when expired
 model BusinessCovenant {
   id        String @id @default(uuid())
   startDate DateTime @map("start_date")
