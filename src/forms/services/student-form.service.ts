@@ -2,7 +2,7 @@ import { PrismaService } from '@/database/services/prisma.service';
 import { S3Service } from '@/database/services/s3.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid'
-import { UploadStudentFormDto } from '../dtos/student-form.dto';
+import { DownloadStudentFormDto, UploadStudentFormDto } from '../dtos/student-form.dto';
 import { StudentForm } from '../entities/student-form.entity';
 import { StudentFormStatus } from '@/global/enums/student-forms.enum';
 import { GetStudentInfoByFormDto } from '../dtos/forms.dto';
@@ -114,5 +114,45 @@ export class StudentFormService {
       })
   
       return studentForm;
+  }
+
+  async downloadPendingForm(data: DownloadStudentFormDto) {
+    const studentForm = await this.prismaService.studenForm.findUnique({
+      where: {
+        id: data.studentFormId,
+        status: StudentFormStatus.PENDIENTE
+      },
+      select: {
+        url: true
+      }
+    })
+    if (!studentForm) {
+      throw new NotFoundException('Student form not found')
+    }
+    const object = await this.s3Service.getPendingObject(studentForm.url)
+    return {
+      file: object.Body,
+      filename: studentForm.url
+    }
+  }
+
+  async downloadApprovedForm(data: DownloadStudentFormDto) {
+    const studentForm = await this.prismaService.studenForm.findUnique({
+      where: {
+        id: data.studentFormId,
+        status: StudentFormStatus.APROBADO
+      },
+      select: {
+        url: true
+      }
+    })
+    if (!studentForm) {
+      throw new NotFoundException('Student form not found')
+    }
+    const object = await this.s3Service.getApprovedObject(studentForm.url)
+    return {
+      file: object.Body,
+      filename: studentForm.url
+    }
   }
 }

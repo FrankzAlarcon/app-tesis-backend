@@ -1,5 +1,10 @@
-import { Body, Controller, Get, HttpCode, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { UploadStudentFormDto } from '../dtos/student-form.dto';
+import {
+  Body, Controller, Get, HttpCode, 
+  HttpStatus, 
+  Post, Query, Res, StreamableFile, UploadedFile,
+  UseGuards, UseInterceptors
+} from '@nestjs/common';
+import { DownloadStudentFormDto, UploadStudentFormDto } from '../dtos/student-form.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { StudentFormService } from '../services/student-form.service';
 import { GetStudentInfoByFormDto } from '../dtos/forms.dto';
@@ -8,6 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
+import { Response } from 'express';
 
 @ApiTags('Student Forms')
 @UseGuards(AuthGuard)
@@ -27,7 +33,7 @@ export class StudentFormController {
   }
 
   @Post('get-by-filename')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @Roles(Role.ADMIN)
   async getByFilename(
     @Body() data: GetStudentInfoByFormDto
@@ -36,7 +42,7 @@ export class StudentFormController {
   }
 
   @Post('upload-pending')
-  @Roles(Role.STUDENT)
+  @Roles(Role.ADMIN, Role.STUDENT)
   @UseInterceptors(FileInterceptor('file'))
   async uploadPendingForm(
     @Body() data: UploadStudentFormDto,
@@ -55,5 +61,32 @@ export class StudentFormController {
   ) {
     console.log(file)
     return this.studenFormService.uploadApprovedStudentForm(file, data)
+  }
+
+  @Post('/download-pending')
+  @HttpCode(HttpStatus.OK)
+  @Roles(Role.ADMIN)
+  async downloadPendingForm(
+    @Body() data: DownloadStudentFormDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const responseDocument = await this.studenFormService.downloadPendingForm(data)
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${responseDocument.filename}`);
+    const byteDocument = await responseDocument.file.transformToByteArray()
+    return new StreamableFile(byteDocument)
+  }
+
+  @Post('/download-approved')
+  @Roles(Role.ADMIN)
+  async downloadApprovedForm(
+    @Body() data: DownloadStudentFormDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const responseDocument = await this.studenFormService.downloadApprovedForm(data)
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${responseDocument.filename}`);
+    const byteDocument = await responseDocument.file.transformToByteArray()
+    return new StreamableFile(byteDocument)
   }
 }
