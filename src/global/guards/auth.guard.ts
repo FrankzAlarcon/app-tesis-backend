@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate {
     context: ExecutionContext,
   ): Promise<boolean> {
     const roles = this.reflector.get<Role[]>(ROLES_KEY, context.getHandler());
-    console.log({ roles })
+    // console.log({ roles })
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
@@ -32,7 +32,7 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verify(token,
         { secret: this.configService.jwt.secret }
       ) as JwtPayload
-      console.log({ payload })
+      // console.log({ payload })
 
       //TODO: Manage the roles
 

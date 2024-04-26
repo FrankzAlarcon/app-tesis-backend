@@ -23,3 +23,13 @@ export class UploadStudentFormDto {
   @IsNotEmpty()
   readonly status?: string
 }
+
+export class DownloadStudentFormDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 'b7458061-a51d-4453-851a-bfa72391e030',
+    description: 'The studentForm identifier'
+  })
+  readonly studentFormId: string
+}

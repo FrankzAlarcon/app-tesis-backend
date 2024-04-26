@@ -17,7 +17,7 @@ export class S3Service {
     return this.s3Service.send(
       new GetObjectCommand({
         Bucket: bucket ?? this.configService.aws.pendingBucket,
-        Key: filename
+        Key: 'pending/' + filename
       })
     )
   }
@@ -26,7 +26,7 @@ export class S3Service {
     return this.s3Service.send(
       new GetObjectCommand({
         Bucket: bucket ?? this.configService.aws.approvedBucket,
-        Key: filename
+        Key: 'approved/' + filename
       })
     )
   }
@@ -35,7 +35,7 @@ export class S3Service {
     return await this.s3Service.send(
       new PutObjectCommand({
         Bucket: bucket ?? this.configService.aws.pendingBucket,
-        Key: filename,
+        Key: 'pending/' + filename,
         Body: file
       })
     )
@@ -45,7 +45,7 @@ export class S3Service {
     return await this.s3Service.send(
       new PutObjectCommand({
         Bucket: bucket ?? this.configService.aws.approvedBucket,
-        Key: filename,
+        Key: 'approved/' + filename,
         Body: file
       })
     )
