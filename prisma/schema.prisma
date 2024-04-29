@@ -70,8 +70,11 @@ model Student {
   user      User @relation(fields: [userId], references: [id])
   userId    String @unique @map("user_id")
 
+  projects Project[]
   contracts Contract[]
   studentForms StudenForm[]
+  certifications Certification[]
+  curriculums Curriculums[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -188,3 +191,79 @@ model StudenForm {
   @@map("student_forms")
 }
 
+model Project {
+  id        String @id @default(uuid())
+  name      String
+  description String?
+  url       String
+
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String @unique @map("student_id")
+
+  projectSkills ProjectSkill[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("projects")
+}
+
+model Skill {
+  id        String @id @default(uuid())
+  name      String @unique
+  description String?
+
+  projectSkills ProjectSkill[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("skills")
+}
+
+model ProjectSkill {
+  id        String @id @default(uuid())
+
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String @unique @map("project_id")
+
+  skill     Skill @relation(fields: [skillId], references: [id])
+  skillId   String @unique @map("skill_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("project_skills")
+}
+
+model Certification {
+  id        String @id @default(uuid())
+  name      String @unique
+  description String?
+  emissionDate DateTime @map("emission_date")
+  url      String
+  issuingBusiness String @map("issuing_business")
+
+  student Student @relation(fields: [studentId], references: [id])
+  studentId String @unique @map("student_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("certifications")
+}
+
+model Curriculums {
+  id        String @id @default(uuid())
+  name      String @unique
+  description String?
+  url      String
+
+  student Student @relation(fields: [studentId], references: [id])
+  studentId String @unique @map("student_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("curriculums")
+}
