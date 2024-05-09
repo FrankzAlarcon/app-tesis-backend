@@ -64,6 +64,8 @@ model Role {
 
 model Student {
   id        String @id @default(uuid())
+  shortPresentation String? @map("short_presentation")
+  description String?
   faculty   String?
   ira       String?
 
@@ -225,20 +227,22 @@ model ProjectSkill {
   id        String @id @default(uuid())
 
   project   Project @relation(fields: [projectId], references: [id])
-  projectId String @unique @map("project_id")
+  projectId String  @map("project_id")
 
   skill     Skill @relation(fields: [skillId], references: [id])
-  skillId   String @unique @map("skill_id")
+  skillId   String @map("skill_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([projectId, skillId])
 
   @@map("project_skills")
 }
 
 model Certification {
   id        String @id @default(uuid())
-  name      String @unique
+  name      String
   description String?
   emissionDate DateTime @map("emission_date")
   url      String
@@ -250,6 +254,8 @@ model Certification {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+
+  @@unique([name, studentId])
   @@map("certifications")
 }
 

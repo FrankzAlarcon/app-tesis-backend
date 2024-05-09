@@ -3,4 +3,6 @@ export interface JwtPayload {
   name: string
   email: string
   role: string
+  studentId?: string
+  businessId?: string
 }

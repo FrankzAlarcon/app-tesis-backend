@@ -9,10 +9,31 @@ import { BusinessController } from './controllers/business.controller';
 import { BusinessCovenantController } from './controllers/business-covenant.controller';
 import { CovenantController } from './controllers/covenant.controller';
 import { CovenantService } from './services/covenant.service';
+import { ProfileService } from './services/student-profile/profile.service';
+import { ProjectsService } from './services/student-profile/projects.service';
+import { SkillsService } from './services/student-profile/skills.service';
+import { ProjectsController } from './controllers/student-profile/projects.controller';
+import { SkillsController } from './controllers/student-profile/skills.controller';
 
 @Module({
   imports: [AuthModule],
-  controllers: [UsersController, StudentsController, BusinessController, BusinessCovenantController, CovenantController],
-  providers: [UsersService, StudentsService, BusinessService, CovenantService]
+  controllers: [
+    UsersController,
+    StudentsController,
+    BusinessController,
+    BusinessCovenantController,
+    CovenantController,
+    SkillsController,
+    ProjectsController
+  ],
+  providers: [
+    UsersService,
+    StudentsService,
+    BusinessService,
+    CovenantService,
+    ProfileService,
+    ProjectsService,
+    SkillsService
+  ]
 })
 export class UsersModule {}

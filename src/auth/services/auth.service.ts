@@ -26,7 +26,7 @@ export class AuthService {
   }
 
   async login (data: LoginDto): Promise<AuthenticatedUser> {
-    const user = await this.prismaService.user.findFirst({
+    const user = await this.prismaService.user.findUnique({
       where: { email: data.email },
       include: { auth: true, roles: true }
     })
@@ -41,11 +41,28 @@ export class AuthService {
       throw new UnauthorizedException('Invalid Credentials')
     }
     console.log(user)
-    const payload = {
+    const payload: any = {
       sub: user.id,
       name: user.name,
       email: user.email,
       role: user.roleId
+    }
+
+    if (user.roles.name === Role.STUDENT) {
+      const student = await this.prismaService.student.findUnique({
+        where: { userId: user.id },
+        select: { id: true }
+      })
+      if (!student) {
+        throw new BadRequestException('Student not found')
+      }
+      payload.studentId = student.id
+    } else if (user.roles.name === Role.BUSINESS) {
+      const business = await this.prismaService.business.findUnique({
+        where: { userId: user.id },
+        select: { id: true }
+      })
+      payload.businessId = business.id
     }
 
     return {
