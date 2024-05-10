@@ -19,6 +19,8 @@ export class ProfileService {
           id: true,
           shortPresentation: true,
           description: true,
+          faculty: true,
+          ira: true,
   
           user: {
             select: {
