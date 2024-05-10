@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumberString, IsString, 
+import { IsEmail, IsNotEmpty, IsNumberString, IsOptional, IsString, 
   // IsStrongPassword 
 } from "class-validator"
 
@@ -20,4 +20,22 @@ export class CreateStudentDto {
 
   @IsNumberString()
   ira: string
+}
+
+export class CompleteStudentProfileDto {
+  @IsString()
+  @IsOptional()
+  shortPresentation?: string
+
+  @IsString()
+  @IsOptional()
+  description?: string
+
+  @IsString()
+  @IsOptional()
+  faculty?: string
+
+  @IsNumberString()
+  @IsOptional()
+  ira?: string
 }

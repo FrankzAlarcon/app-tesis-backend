@@ -2,7 +2,7 @@ import { AuthService } from '@/auth/services/auth.service';
 import { RolesService } from '@/auth/services/roles.service';
 import { PrismaService } from '@/database/services/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateStudentDto } from '../dtos/student.dto';
+import { CompleteStudentProfileDto, CreateStudentDto } from '../dtos/student.dto';
 import { Role } from '@/global/enums/roles.enum';
 
 @Injectable()
@@ -53,6 +53,19 @@ export class StudentsService {
       })
 
       return student
+    })
+  }
+
+  async completeProfile(id: string, data: CompleteStudentProfileDto) {
+    const student = await this.prismaService.student.findUnique({
+      where: { id }
+    })
+    if (!student) {
+      throw new BadRequestException('Student not found')
+    }
+    return this.prismaService.student.update({
+      where: { id },
+      data
     })
   }
 }

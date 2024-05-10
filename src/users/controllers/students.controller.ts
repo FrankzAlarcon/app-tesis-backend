@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { StudentsService } from '../services/students.service';
-import { CreateStudentDto } from '../dtos/student.dto';
+import { CompleteStudentProfileDto, CreateStudentDto } from '../dtos/student.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
@@ -36,4 +36,15 @@ export class StudentsController {
   ) {
     return await this.studentsService.create(data)
   }
+
+  @Post('/complete-profile')
+  @Roles(Role.STUDENT)
+  async completeProfile(
+    @Req() req: any,
+    @Body() data: CompleteStudentProfileDto
+  ) {
+    const user = req.user as JwtPayload
+    return this.studentsService.completeProfile(user.studentId, data)
+  }
+
 }
