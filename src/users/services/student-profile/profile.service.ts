@@ -1,12 +1,14 @@
 import { PrismaService } from '@/database/services/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
+import { CertificationsService } from './certifications.service';
 
 @Injectable()
 export class ProfileService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly projectsService: ProjectsService
+    private readonly projectsService: ProjectsService,
+    private readonly certificationsService: CertificationsService
   ){ }
 
   //TODO: Add Registro de Practas info
@@ -30,17 +32,17 @@ export class ProfileService {
           }
         }
       }),
-      this.projectsService.getByStudent(studentId)
-      // Get certifications
+      this.projectsService.getByStudent(studentId),
+      this.certificationsService.getByStudent(studentId)
     ])
 
-    const [student, projects] = promises;
+    const [student, projects, certifications] = promises;
     const {user, ...rest} = student
     return {
       ...user,
       ...rest,
       projects,
-      certifications: []
+      certifications
     }
   }
 }

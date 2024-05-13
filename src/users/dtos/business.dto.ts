@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from "class-validator"
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Length } from "class-validator"
 
 export class CreateBusinessDto {
   @IsString()
@@ -19,8 +19,20 @@ export class CreateBusinessDto {
 }
 
 export class CompleteProfileDto {
+  @IsString()
+  @IsOptional()
   province?: string
+
+  @IsString()
+  @IsOptional()
   city?: string
+
+  @IsString()
+  @Length(10)
+  @IsOptional()
   phone?: string
+
+  @IsString()
+  @IsOptional()
   description?: string
 }

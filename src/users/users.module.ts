@@ -14,6 +14,8 @@ import { ProjectsService } from './services/student-profile/projects.service';
 import { SkillsService } from './services/student-profile/skills.service';
 import { ProjectsController } from './controllers/student-profile/projects.controller';
 import { SkillsController } from './controllers/student-profile/skills.controller';
+import { CertificationsService } from './services/student-profile/certifications.service';
+import { CertificationsController } from './controllers/student-profile/certifications.controller';
 
 @Module({
   imports: [AuthModule],
@@ -24,7 +26,8 @@ import { SkillsController } from './controllers/student-profile/skills.controlle
     BusinessCovenantController,
     CovenantController,
     SkillsController,
-    ProjectsController
+    ProjectsController,
+    CertificationsController
   ],
   providers: [
     UsersService,
@@ -33,7 +36,8 @@ import { SkillsController } from './controllers/student-profile/skills.controlle
     CovenantService,
     ProfileService,
     ProjectsService,
-    SkillsService
+    SkillsService,
+    CertificationsService
   ]
 })
 export class UsersModule {}
