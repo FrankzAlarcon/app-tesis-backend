@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { StudentsService } from '../services/students.service';
 import { CompleteStudentProfileDto, CreateStudentDto } from '../dtos/student.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -37,7 +37,7 @@ export class StudentsController {
     return await this.studentsService.create(data)
   }
 
-  @Post('/complete-profile')
+  @Put('/complete-profile')
   @Roles(Role.STUDENT)
   async completeProfile(
     @Req() req: any,
