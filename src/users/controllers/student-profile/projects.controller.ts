@@ -3,7 +3,7 @@ import { Role } from '@/global/enums/roles.enum';
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { CreateProjectDto } from '@/users/dtos/projects.dto';
 import { ProjectsService } from '@/users/services/student-profile/projects.service';
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Projects') 
@@ -31,5 +31,15 @@ export class ProjectsController {
   ) {
     const studentId = req.user.studentId;
     return this.projectsService.create(data, studentId);
+  }
+
+  @Delete(':id')
+  @Roles(Role.STUDENT)
+  async remove(
+    @Req() req: any,
+    @Param('id') id: string 
+  ) {
+    const studentId = req.user.studentId;
+    return this.projectsService.remove(id, studentId);
   }
 }

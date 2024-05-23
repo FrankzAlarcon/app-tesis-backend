@@ -79,4 +79,25 @@ export class ProjectsService {
       }
     })
   }
+
+  async remove(id: string, studentId: string) {
+    if (!studentId) {
+      throw new BadRequestException('User not found')
+    }
+    const project = await this.prismaService.project.findUnique({
+      where: { id, studentId },
+      select: { id: true }
+    })
+    if (!project) {
+      throw new BadRequestException('Project not found')
+    }
+    return this.prismaService.$transaction(async (tx) => {
+      await tx.projectSkill.deleteMany({
+        where: { projectId: id }
+      });
+      return tx.project.delete({
+        where: { id }
+      });
+    })
+  }
 }

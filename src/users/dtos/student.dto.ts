@@ -14,12 +14,6 @@ export class CreateStudentDto {
   @IsString()
   // @IsStrongPassword({ minLength: 8 })
   password: string
-
-  @IsString()
-  faculty: string
-
-  @IsNumberString()
-  ira: string
 }
 
 export class CompleteStudentProfileDto {

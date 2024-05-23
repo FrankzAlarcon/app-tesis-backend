@@ -4,7 +4,7 @@ import { AuthGuard } from '@/global/guards/auth.guard';
 import { JwtPayload } from '@/global/interfaces/jwt.interface';
 import { CreateCertificationDto } from '@/users/dtos/certifications.dto';
 import { CertificationsService } from '@/users/services/student-profile/certifications.service';
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Certifications') 
@@ -32,5 +32,15 @@ export class CertificationsController {
   ) {
     const user = req.user as JwtPayload;
     return this.certificationsService.create(data, user.studentId);
+  }
+
+  @Delete(':id')
+  @Roles(Role.STUDENT)
+  async remove(
+    @Req() req: any,
+    @Param('id') id: string 
+  ) {
+    const user = req.user as JwtPayload;
+    return this.certificationsService.remove(id, user.studentId);
   }
 }

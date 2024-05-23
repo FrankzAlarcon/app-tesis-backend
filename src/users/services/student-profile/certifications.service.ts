@@ -30,4 +30,18 @@ export class CertificationsService {
       }
     })
   }
+
+  async remove(id: string, studentId: string) {
+    const certification = await this.prismaService.certification.findFirst({
+      where: { id, studentId }
+    })
+
+    if (!certification) {
+      throw new NotFoundException('Certification not found')
+    }
+
+    return this.prismaService.certification.delete({
+      where: { id }
+    })
+  }
 }
