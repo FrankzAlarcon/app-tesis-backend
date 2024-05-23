@@ -130,8 +130,6 @@ export class AuthService {
       const student = await tx.student.create({
         data: {
           userId: user.id,
-          faculty: data.faculty,
-          ira: data.ira
         }
       })
 
