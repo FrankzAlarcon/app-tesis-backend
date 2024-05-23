@@ -47,8 +47,6 @@ export class StudentsService {
       const student = await tx.student.create({
         data: {
           userId: user.id,
-          faculty: data.faculty,
-          ira: data.ira
         }
       })
 
