@@ -12,7 +12,21 @@ export class PublicationsService {
   ) {}
 
   async getAll(params: PaginationQueryDto) {
-    return await this.paginationService.paginate(this.prismaService.publication, params)
+    return await this.paginationService.paginate(
+      this.prismaService.publication,
+      params,
+      {}, 
+      {
+        include:{
+          business: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      }
+    )
   }
 
   async getByBusinessId(businessId: string, params: PaginationQueryDto) {

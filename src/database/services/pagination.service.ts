@@ -6,7 +6,8 @@ export class PaginationService {
   async paginate(
     entity: any,
     params: PaginationQueryDto,
-    where?: any
+    where?: any,
+    findParams: any = {}
   ) {
     let total: number = 0;
     if (params.filterField && params.filterValue) {
@@ -25,7 +26,8 @@ export class PaginationService {
     const data = await entity.findMany({
       where,
       skip: params.offset,
-      take: params.limit
+      take: params.limit,
+      ...findParams
     })
 
     let totalPages = 1

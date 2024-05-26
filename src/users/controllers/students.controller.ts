@@ -1,4 +1,16 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseGuards
+} from '@nestjs/common';
 import { StudentsService } from '../services/students.service';
 import { CompleteStudentProfileDto, CreateStudentDto } from '../dtos/student.dto';
 import { ApiTags } from '@nestjs/swagger';
