@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { StudentsService } from '../services/students.service';
 import { CompleteStudentProfileDto, CreateStudentDto } from '../dtos/student.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -7,6 +7,7 @@ import { Role } from '@/global/enums/roles.enum';
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { JwtPayload } from '@/global/interfaces/jwt.interface';
 import { ProfileService } from '../services/student-profile/profile.service';
+import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 
 @ApiTags('Students')
 @UseGuards(AuthGuard)
@@ -16,6 +17,16 @@ export class StudentsController {
     private readonly studentsService: StudentsService,
     private readonly profileService: ProfileService
   ){}
+
+  @Get('/feed')
+  @Roles(Role.STUDENT)
+  async getFeed(
+    @Req() req: any,
+    @Query() params: PaginationQueryDto
+  ) {
+    const user = req.user as JwtPayload
+    return this.studentsService.getFeed(user.studentId, params)
+  }
 
   @Get('/profile')
   @Roles(Role.ADMIN, Role.STUDENT)
@@ -31,6 +42,7 @@ export class StudentsController {
 
   @Post()
   @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() data: CreateStudentDto
   ) {

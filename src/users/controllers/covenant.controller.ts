@@ -1,6 +1,6 @@
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CovenantService } from '../services/covenant.service';
 import { CreateCovenantDto } from '../dtos/covenant.dto';
@@ -19,6 +19,7 @@ export class CovenantController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() data: CreateCovenantDto
   ) {

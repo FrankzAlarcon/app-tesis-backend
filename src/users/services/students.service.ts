@@ -1,17 +1,23 @@
 import { AuthService } from '@/auth/services/auth.service';
-import { RolesService } from '@/auth/services/roles.service';
 import { PrismaService } from '@/database/services/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CompleteStudentProfileDto, CreateStudentDto } from '../dtos/student.dto';
 import { Role } from '@/global/enums/roles.enum';
+import { PublicationsService } from '@/publications/services/publications.service';
+import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 
 @Injectable()
 export class StudentsService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly rolesService: RolesService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly publicationsService: PublicationsService
   ) {}
+
+  async getFeed(_studentId: string, params: PaginationQueryDto) {
+    // TODO: get publications by student interests
+    return this.publicationsService.getAll(params)
+  }
 
   async create(data: CreateStudentDto) {
     // TODO: add email validation, and those things

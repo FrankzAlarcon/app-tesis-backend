@@ -72,6 +72,8 @@ model Student {
   user      User @relation(fields: [userId], references: [id])
   userId    String @unique @map("user_id")
 
+  studentBookmarks StudentBookmarks[]
+
   projects Project[]
   contracts Contract[]
   studentForms StudenForm[]
@@ -82,6 +84,21 @@ model Student {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("students")
+}
+
+model StudentBookmarks {
+  id        String @id @default(uuid())
+
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String @map("student_id")
+
+  publication Publication @relation(fields: [publicationId], references: [id])
+  publicationId String @map("publication_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("student_bookmarks")
 }
 
 model Business {
@@ -98,6 +115,7 @@ model Business {
   userId    String @unique @map("user_id")
 
   businessCovenants BusinessCovenant?
+  publications Publication[]
 
   contracts Contract[]
 
@@ -217,6 +235,7 @@ model Skill {
   description String?
 
   projectSkills ProjectSkill[]
+  publicationSkills PublicationSkill[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -273,4 +292,44 @@ model Curriculums {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("curriculums")
+}
+
+model Publication {
+  id        String @id @default(uuid())
+  description String
+  modality  String
+  entryTime String @map("entry_time")
+  departureTime String @map("departure_time")
+  benefits  String
+  requirements String
+  url       String?
+  remuneration Decimal? @default(0)
+
+  business  Business @relation(fields: [businessId], references: [id])
+  businessId String @map("business_id")
+  
+  publicationSkills PublicationSkill[]
+  studentBookmarks StudentBookmarks[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("publications")
+}
+
+model PublicationSkill {
+  id        String @id @default(uuid())
+
+  publication Publication @relation(fields: [publicationId], references: [id])
+  publicationId String @map("publication_id")
+
+  skill     Skill @relation(fields: [skillId], references: [id])
+  skillId   String @map("skill_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([publicationId, skillId])
+
+  @@map("publication_skills")
 }

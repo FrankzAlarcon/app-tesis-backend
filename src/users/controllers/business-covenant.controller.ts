@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { BusinessService } from '../services/business.service';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/global/guards/auth.guard';
@@ -16,6 +16,7 @@ export class BusinessCovenantController {
 
   @Post()
   @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.CREATED)
   async createCovenantWithBusiness(
     @Body() data: CreateBusinessCovenantDto
   ) {

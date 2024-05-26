@@ -16,9 +16,10 @@ import { ProjectsController } from './controllers/student-profile/projects.contr
 import { SkillsController } from './controllers/student-profile/skills.controller';
 import { CertificationsService } from './services/student-profile/certifications.service';
 import { CertificationsController } from './controllers/student-profile/certifications.controller';
+import { PublicationsModule } from '@/publications/publications.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, PublicationsModule],
   controllers: [
     UsersController,
     StudentsController,
