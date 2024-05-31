@@ -8,8 +8,8 @@ export class BookmarksService {
     private readonly prismaService: PrismaService
   ) {}
 
-  async create(data: CreateBookmarkDto) {
-    const {publicationId, studentId} = data
+  async create(data: CreateBookmarkDto, studentId: string) {
+    const { publicationId } = data
     return this.prismaService.studentBookmarks.create({
       data: {
         studentId,
