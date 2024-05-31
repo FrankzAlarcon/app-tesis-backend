@@ -29,6 +29,36 @@ export class PublicationsService {
     )
   }
 
+  async getAllBookmarkedByStudent(studentId: string, params: PaginationQueryDto) {
+    return await this.paginationService.paginate(
+      this.prismaService.studentBookmarks,
+      params,
+      { studentId },
+      {
+        select: {
+          id: true,
+          studentId: true,
+          publicationId: true,
+          publication: {
+            select: {
+              id: true,
+              description: true,
+              modality: true,
+              business: {
+                select: {
+                  id: true,
+                  name: true,
+                }
+              },
+              createdAt: true,
+              updatedAt: true
+            }
+          }
+        }
+      }
+    )
+  }
+
   async getByBusinessId(businessId: string, params: PaginationQueryDto) {
     return await this.paginationService.paginate(this.prismaService.publication, params, { businessId })
   }

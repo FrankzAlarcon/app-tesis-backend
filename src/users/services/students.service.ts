@@ -5,18 +5,28 @@ import { CompleteStudentProfileDto, CreateStudentDto } from '../dtos/student.dto
 import { Role } from '@/global/enums/roles.enum';
 import { PublicationsService } from '@/publications/services/publications.service';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
+import { ForumService } from '@/publications/services/forum.service';
 
 @Injectable()
 export class StudentsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
-    private readonly publicationsService: PublicationsService
+    private readonly publicationsService: PublicationsService,
+    private readonly forumService: ForumService
   ) {}
 
   async getFeed(_studentId: string, params: PaginationQueryDto) {
     // TODO: get publications by student interests
     return this.publicationsService.getAll(params)
+  }
+
+  async getBookmarks(studentId: string, params: PaginationQueryDto) {
+    return this.publicationsService.getAllBookmarkedByStudent(studentId, params)
+  }
+
+  async getForums(studentId: string, params: PaginationQueryDto) {
+    return this.forumService.getAllByStudent(studentId, params)
   }
 
   async create(data: CreateStudentDto) {

@@ -40,6 +40,16 @@ export class StudentsController {
     return this.studentsService.getFeed(user.studentId, params)
   }
 
+  @Get('/bookmarks')
+  @Roles(Role.STUDENT)
+  async getBookmarks(
+    @Req() req: any,
+    @Query() params: PaginationQueryDto
+  ) {
+    const user = req.user as JwtPayload
+    return this.studentsService.getBookmarks(user.studentId, params)
+  }
+
   @Get('/profile')
   @Roles(Role.ADMIN, Role.STUDENT)
   async getProfile(
@@ -50,6 +60,16 @@ export class StudentsController {
       throw new BadRequestException('Student not found')
     }
     return this.profileService.studentProfileInfo(user.studentId)
+  }
+
+  @Get('/forums')
+  @Roles(Role.STUDENT)
+  async getForums(
+    @Req() req: any,
+    @Query() params: PaginationQueryDto
+  ) {
+    const user = req.user as JwtPayload
+    return this.studentsService.getForums(user.studentId, params)
   }
 
   @Post()

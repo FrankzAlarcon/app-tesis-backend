@@ -79,6 +79,7 @@ model Student {
   studentForms StudenForm[]
   certifications Certification[]
   curriculums Curriculums[]
+  forums Forum[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -98,6 +99,7 @@ model StudentBookmarks {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  @@unique([studentId, publicationId])
   @@map("student_bookmarks")
 }
 
@@ -116,6 +118,7 @@ model Business {
 
   businessCovenants BusinessCovenant?
   publications Publication[]
+  forums Forum[]
 
   contracts Contract[]
 
@@ -332,4 +335,22 @@ model PublicationSkill {
   @@unique([publicationId, skillId])
 
   @@map("publication_skills")
+}
+
+model Forum {
+  id        String @id @default(uuid())
+  title     String
+  description String
+  grade     Int
+
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String @map("student_id")
+
+  business  Business @relation(fields: [businessId], references: [id])
+  businessId String @map("business_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("forums")
 }
