@@ -44,4 +44,45 @@ export class PaginationService {
       data
     }
   }
+
+  async paginateGroupBy(
+    entity: any,
+    groupBy: any,
+    params: PaginationQueryDto,
+    where?: any,
+  ) {
+    let total: number = 0;
+    if (params.filterField && params.filterValue) {
+      total = await entity.count({
+        where: {
+          ...where,
+          [params.filterField]: params.filterValue
+        }
+      })
+    } else {
+      total = await entity.count({
+        where
+      })
+    }
+
+    const data = await entity.groupBy({
+      ...groupBy,
+      skip: params.offset,
+      take: params.limit,
+    })
+
+    let totalPages = 1
+    total = data.length
+    if (params.limit) {
+      totalPages = Math.ceil(total / params.limit)
+    }
+
+    // console.log('[pagination service] data', data)
+
+    return {
+      total,
+      totalPages,
+      data
+    }
+  }
 }

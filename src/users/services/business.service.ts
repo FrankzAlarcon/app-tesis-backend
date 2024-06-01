@@ -7,12 +7,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { PaginationService } from '@/database/services/pagination.service';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { CreateBusinessCovenantDto, RemoveBusinessCovenantDto } from '../dtos/business-covenant.dto';
+import { PublicationsService } from '@/publications/services/publications.service';
 
 @Injectable()
 export class BusinessService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
+    private readonly publicationService: PublicationsService,
     private readonly paginationService: PaginationService
   ) {}
 
@@ -22,6 +24,10 @@ export class BusinessService {
 
   async getAllWithoutCovenant(params: PaginationQueryDto) {
     return this.paginationService.paginate(this.prismaService.business, params, { hasCovenant: false })
+  }
+
+  async getAllForumByBusiness(businessId: string, params: PaginationQueryDto) {
+    return this.paginationService.paginate(this.prismaService.forum, params, { businessId })
   }
 
   // This method is used on

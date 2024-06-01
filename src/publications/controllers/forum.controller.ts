@@ -35,6 +35,14 @@ export class ForumController {
     return this.forumService.getAllByStudent(user.studentId, params);
   }
 
+  @Roles(Role.STUDENT, Role.BUSINESS)
+  @Get('/group-by-business')
+  async groupByBusiness(
+    @Query() params: PaginationQueryDto
+  ) {
+    return this.forumService.getAllGroupByBusiness(params);
+  }
+
   @Roles(Role.STUDENT)
   @Post('/')
   async create(

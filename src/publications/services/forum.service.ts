@@ -11,6 +11,46 @@ export class ForumService {
     private readonly paginationService: PaginationService
   ) {}
 
+  async getAllGroupByBusiness(params: PaginationQueryDto) {
+    const forumsByBusiness = await this.paginationService.paginateGroupBy(this.prismaService.forum, {
+      by: ['businessId'],
+      _count: {
+        id: true
+      },
+      _avg: {
+        grade: true
+      }
+    }, params)
+    const business = await this.prismaService.business.findMany({
+      where: {
+        id: {
+          in: forumsByBusiness.data.map((forum: any) => forum.businessId)
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true
+      }
+    })
+    const mappedData = forumsByBusiness.data.map((forum: any) => {
+      const businessFind = business.find((b) => b.id === forum.businessId)
+      return {
+        businessId: forum.businessId,
+        businessName: businessFind?.name,
+        businessDescription: businessFind?.description,
+        count: forum._count.id,
+        avgGrade: forum._avg.grade
+      }
+    })
+
+    return {
+      ...forumsByBusiness,
+      data: mappedData
+    }
+    // return await this.paginationService.paginate(this.prismaService.publication, params, { businessId })
+  }
+
   async getAllByBusiness(businessId: string, params: PaginationQueryDto) {
     return await this.paginationService.paginate(
       this.prismaService.forum,
