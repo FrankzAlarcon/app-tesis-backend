@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { BusinessService } from '../services/business.service';
 // import { CreateBusinessDto } from '../dtos/business.dto';
 import { AuthGuard } from '@/global/guards/auth.guard';
@@ -39,6 +39,14 @@ export class BusinessController {
     @Query() params: PaginationQueryDto
   ) {
     return this.businessService.getAllWithoutCovenant(params);
+  }
+
+  @Get('/short-information/:businessId')
+  @Roles(Role.STUDENT)
+  async getShortInformation(
+    @Param('businessId') businessId: string
+  ) {
+    return this.businessService.getShortInformation(businessId);
   }
 
   @Post('/complete-profile')

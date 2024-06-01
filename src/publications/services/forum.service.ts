@@ -48,7 +48,6 @@ export class ForumService {
       ...forumsByBusiness,
       data: mappedData
     }
-    // return await this.paginationService.paginate(this.prismaService.publication, params, { businessId })
   }
 
   async getAllByBusiness(businessId: string, params: PaginationQueryDto) {

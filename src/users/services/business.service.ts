@@ -30,6 +30,13 @@ export class BusinessService {
     return this.paginationService.paginate(this.prismaService.forum, params, { businessId })
   }
 
+  async getShortInformation(businessId: string) {
+    return this.prismaService.business.findUnique({
+      where: { id: businessId },
+      select: { id: true, name: true }
+    })
+  }
+
   // This method is used on
   async create(data: CreateBusinessDto) {
     // TODO: add email validation, and those things
