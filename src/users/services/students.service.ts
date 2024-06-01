@@ -16,9 +16,9 @@ export class StudentsService {
     private readonly forumService: ForumService
   ) {}
 
-  async getFeed(_studentId: string, params: PaginationQueryDto) {
+  async getFeed(studentId: string, params: PaginationQueryDto) {
     // TODO: get publications by student interests
-    return this.publicationsService.getAll(params)
+    return this.publicationsService.getAll(studentId, params)
   }
 
   async getBookmarks(studentId: string, params: PaginationQueryDto) {

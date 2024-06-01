@@ -11,8 +11,8 @@ export class PublicationsService {
     private readonly paginationService: PaginationService
   ) {}
 
-  async getAll(params: PaginationQueryDto) {
-    return await this.paginationService.paginate(
+  async getAll(studentId: string, params: PaginationQueryDto) {
+    const business = await this.paginationService.paginate(
       this.prismaService.publication,
       params,
       {}, 
@@ -23,10 +23,27 @@ export class PublicationsService {
               id: true,
               name: true
             }
-          }
+          },
         }
       }
     )
+
+    const studentBookmarks = await this.prismaService.studentBookmarks.findMany({
+      where: { studentId, publicationId: { in: business.data.map(p => p.id)}}
+    })
+
+    const publications = business.data.map(p => {
+      const bookmark = studentBookmarks.find(b => b.publicationId === p.id)
+      return {
+        ...p,
+        bookmarked: !!bookmark
+      }
+    })
+
+    return {
+      ...business,
+      data: publications
+    }
   }
 
   async getAllBookmarkedByStudent(studentId: string, params: PaginationQueryDto) {
@@ -50,6 +67,7 @@ export class PublicationsService {
                   name: true,
                 }
               },
+              
               createdAt: true,
               updatedAt: true
             }
