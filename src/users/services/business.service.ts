@@ -22,6 +22,15 @@ export class BusinessService {
     return this.paginationService.paginate(this.prismaService.business, params)
   }
 
+  async getAllShortInformation(params: PaginationQueryDto) {
+    return this.paginationService.paginate(
+      this.prismaService.business,
+      params,
+      {},
+      {select: { id: true, name: true } }
+    )
+  }
+
   async getAllWithoutCovenant(params: PaginationQueryDto) {
     return this.paginationService.paginate(this.prismaService.business, params, { hasCovenant: false })
   }

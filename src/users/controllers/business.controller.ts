@@ -33,6 +33,14 @@ export class BusinessController {
     return this.businessService.getAll(params);
   }
 
+  @Get('/short-information')
+  @Roles(Role.STUDENT)
+  async getAllShortInformation(
+    @Query() params: PaginationQueryDto
+  ) {
+    return this.businessService.getAllShortInformation(params);
+  }
+
   @Get('/without-covenant')
   @Roles(Role.ADMIN)
   async getWithoutCovenant(
