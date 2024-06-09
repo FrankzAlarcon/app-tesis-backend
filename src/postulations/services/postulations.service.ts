@@ -18,6 +18,26 @@ export class PostulationsService {
     );
   }
 
+  async getLast() {
+    return this.prismaService.postulation.findMany({
+      take: 2,
+      orderBy: {
+        createdAt: 'desc'
+      },
+      select: {
+        id: true,
+        publication: {
+          select: {
+            id: true,
+            title: true,
+            modality: true,
+            createdAt: true,
+          }
+        }
+      }
+    })
+  }
+
   async getAllByStudent(studentId: string, params: PaginationQueryDto) {
     const postulations = await this.paginationService.paginate(
       this.prismaService.postulation,

@@ -27,6 +27,12 @@ export class PostulationsController {
   }
 
   @Roles(Role.STUDENT)
+  @Get('/last')
+  async getLast() {
+    return await this.postulationsService.getLast()
+  }
+
+  @Roles(Role.STUDENT)
   @Post()
   async create(
     @Req() req: any,

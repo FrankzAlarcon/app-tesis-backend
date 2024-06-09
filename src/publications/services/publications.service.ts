@@ -95,6 +95,19 @@ export class PublicationsService {
     })
   }
 
+  async getLast() {
+    return this.prismaService.publication.findMany({
+      take: 2,
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        modality: true,
+        createdAt: true,
+      }
+    })
+  }
+
   async create(data: CreatePublicationDto, businessId: string) {
     return this.prismaService.$transaction(async (tx) => {
       const { skillsIds, remuneration, ...rest } = data
