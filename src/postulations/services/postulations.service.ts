@@ -27,6 +27,7 @@ export class PostulationsService {
         select: {
           publication: {
             select: {
+              id: true,
               title: true,
               modality: true,
               createdAt: true,
