@@ -28,8 +28,11 @@ export class PostulationsController {
 
   @Roles(Role.STUDENT)
   @Get('/last')
-  async getLast() {
-    return await this.postulationsService.getLast()
+  async getLast(
+    @Req() req: any
+  ) {
+    const user = req.user as JwtPayload
+    return await this.postulationsService.getLast(user.studentId)
   }
 
   @Roles(Role.STUDENT)

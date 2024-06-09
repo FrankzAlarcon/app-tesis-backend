@@ -18,9 +18,12 @@ export class PostulationsService {
     );
   }
 
-  async getLast() {
+  async getLast(studentId: string) {
     return this.prismaService.postulation.findMany({
       take: 2,
+      where: {
+        studentId
+      },
       orderBy: {
         createdAt: 'desc'
       },
