@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Query,
   Req,
@@ -38,6 +39,14 @@ export class PublicationsController {
       throw new BadRequestException('User does not have a business');
     }
     return this.publicationsService.getByBusinessId(user.businessId, params);
+  }
+
+  @Get(':publicationId')
+  @Roles(Role.BUSINESS, Role.STUDENT)
+  async getOne(
+    @Param('publicationId') publicationId: string,
+  ) {
+    return this.publicationsService.getOne(publicationId);
   }
 
   @Post()

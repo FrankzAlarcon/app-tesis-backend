@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { FormsModule } from './forms/forms.module';
 import { PublicationsModule } from './publications/publications.module';
+import { PostulationsModule } from './postulations/postulations.module';
 import config from './config';
 
 @Module({
@@ -21,6 +22,7 @@ import config from './config';
       load: [config]
     }),
     PublicationsModule,
+    PostulationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

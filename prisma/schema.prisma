@@ -80,6 +80,7 @@ model Student {
   certifications Certification[]
   curriculums Curriculums[]
   forums Forum[]
+  postulations Postulation[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -299,6 +300,7 @@ model Curriculums {
 
 model Publication {
   id        String @id @default(uuid())
+  title     String @default("Sin título")
   description String
   modality  String
   entryTime String @map("entry_time")
@@ -313,6 +315,7 @@ model Publication {
   
   publicationSkills PublicationSkill[]
   studentBookmarks StudentBookmarks[]
+  postulations Postulation[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -353,4 +356,29 @@ model Forum {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("forums")
+}
+
+enum PostulationStatus {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+}
+
+model Postulation {
+  id        String @id @default(uuid())
+  status    PostulationStatus
+  message   String
+  urlCV       String? @map("url_cv")
+
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String @map("student_id")
+
+  publication Publication @relation(fields: [publicationId], references: [id])
+  publicationId String @map("publication_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([studentId, publicationId])
+  @@map("postulations")
 }

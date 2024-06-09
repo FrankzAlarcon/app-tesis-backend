@@ -81,6 +81,20 @@ export class PublicationsService {
     return await this.paginationService.paginate(this.prismaService.publication, params, { businessId })
   }
 
+  async getOne(publicationId: string) {
+    return this.prismaService.publication.findUnique({
+      where: { id: publicationId },
+      include:{
+        business: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+      }
+    })
+  }
+
   async create(data: CreatePublicationDto, businessId: string) {
     return this.prismaService.$transaction(async (tx) => {
       const { skillsIds, remuneration, ...rest } = data
