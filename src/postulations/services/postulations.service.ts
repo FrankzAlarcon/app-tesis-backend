@@ -32,6 +32,13 @@ export class PostulationsService {
             title: true,
             modality: true,
             createdAt: true,
+            business: {
+              select: {
+                id: true,
+                name: true,
+                province: true
+              }
+            }
           }
         }
       }

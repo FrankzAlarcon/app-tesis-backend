@@ -104,6 +104,13 @@ export class PublicationsService {
         title: true,
         modality: true,
         createdAt: true,
+        business: {
+          select: {
+            id: true,
+            name: true,
+            province: true
+          }
+        }
       }
     })
   }
