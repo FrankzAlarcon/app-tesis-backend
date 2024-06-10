@@ -19,7 +19,7 @@ export class PostulationsService {
   }
 
   async getLast(studentId: string) {
-    return this.prismaService.postulation.findMany({
+    const postulations = await this.prismaService.postulation.findMany({
       take: 2,
       where: {
         studentId
@@ -28,7 +28,6 @@ export class PostulationsService {
         createdAt: 'desc'
       },
       select: {
-        id: true,
         publication: {
           select: {
             id: true,
@@ -46,6 +45,12 @@ export class PostulationsService {
         }
       }
     })
+
+    const mappedPostulations = postulations.map((postulation) => ({
+      ...postulation.publication
+    }))
+
+    return mappedPostulations
   }
 
   async getAllByStudent(studentId: string, params: PaginationQueryDto) {
