@@ -50,9 +50,11 @@ export class PublicationsController {
   @Get(':publicationId')
   @Roles(Role.BUSINESS, Role.STUDENT)
   async getOne(
+    @Req() req: any,
     @Param('publicationId') publicationId: string,
   ) {
-    return this.publicationsService.getOne(publicationId);
+    const user = req.user as JwtPayload;
+    return this.publicationsService.getOne(publicationId, user.studentId);
   }
 
   @Post()

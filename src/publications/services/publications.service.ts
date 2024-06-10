@@ -81,18 +81,29 @@ export class PublicationsService {
     return await this.paginationService.paginate(this.prismaService.publication, params, { businessId })
   }
 
-  async getOne(publicationId: string) {
-    return this.prismaService.publication.findUnique({
+  async getOne(publicationId: string, studentId: string) {
+    const publication = await this.prismaService.publication.findUnique({
       where: { id: publicationId },
       include:{
         business: {
           select: {
             id: true,
             name: true
-          }
+          },
         },
       }
     })
+
+    const wasAlreadyPostulated = await this.prismaService.postulation.count({
+      where: { publicationId, studentId },
+    })
+    
+    return {
+      publication,
+      wasAlreadyPostulated: !!wasAlreadyPostulated
+    }
+
+
   }
 
   async getLast() {
