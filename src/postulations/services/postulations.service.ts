@@ -63,6 +63,7 @@ export class PostulationsService {
       { studentId },
       {
         select: {
+          id: true,
           publication: {
             select: {
               id: true,
@@ -81,7 +82,8 @@ export class PostulationsService {
       }
     )
     const mappedPostulations = postulations.data.map((postulation) => ({
-      ...postulation.publication
+      ...postulation.publication,
+      postulationId: postulation.id
     }))
 
     return {
