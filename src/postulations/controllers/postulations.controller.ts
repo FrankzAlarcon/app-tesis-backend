@@ -1,4 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body,
+  Controller, Delete, Get, Param, Post, Query, Req, 
+  UploadedFile, 
+  UseGuards, UseInterceptors
+} from '@nestjs/common';
 import { PostulationsService } from '../services/postulations.service';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/global/guards/auth.guard';
@@ -7,6 +11,7 @@ import { Role } from '@/global/enums/roles.enum';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { JwtPayload } from '@/global/interfaces/jwt.interface';
 import { CreatePostulationDto } from '../dtos/postulations.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Postulations')
 @UseGuards(AuthGuard)
@@ -37,12 +42,14 @@ export class PostulationsController {
 
   @Roles(Role.STUDENT)
   @Post()
+  @UseInterceptors(FileInterceptor('cv'))
   async create(
     @Req() req: any,
-    @Body() data: CreatePostulationDto
+    @Body() data: CreatePostulationDto,
+    @UploadedFile() cv: Express.Multer.File
   ) {
     const user = req.user as JwtPayload
-    return await this.postulationsService.create(data, user.studentId)
+    return await this.postulationsService.create(data, cv, user.studentId)
   }
 
   @Roles(Role.STUDENT)

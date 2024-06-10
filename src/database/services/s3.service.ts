@@ -31,6 +31,7 @@ export class S3Service {
     )
   }
 
+
   async uploadPendingObject(filename: string, file: Buffer, bucket?: string) {
     return await this.s3Service.send(
       new PutObjectCommand({
@@ -46,6 +47,16 @@ export class S3Service {
       new PutObjectCommand({
         Bucket: bucket ?? this.configService.aws.approvedBucket,
         Key: 'approved/' + filename,
+        Body: file
+      })
+    )
+  }
+
+  async uploadCV(filename: string, file: Buffer, bucket?: string) {
+    return await this.s3Service.send(
+      new PutObjectCommand({
+        Bucket: bucket ?? this.configService.aws.cvBucket,
+        Key: filename,
         Body: file
       })
     )

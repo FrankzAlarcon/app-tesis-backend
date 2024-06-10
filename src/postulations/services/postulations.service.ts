@@ -3,12 +3,15 @@ import { PrismaService } from '@/database/services/prisma.service';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { Injectable } from '@nestjs/common';
 import { CreatePostulationDto } from '../dtos/postulations.dto';
+import { v4 as uuidv4 } from 'uuid'
+import { S3Service } from '@/database/services/s3.service';
 
 @Injectable()
 export class PostulationsService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly paginationService: PaginationService
+    private readonly paginationService: PaginationService,
+    private readonly s3Service: S3Service
   ) {}
 
   async getAll(params: PaginationQueryDto) {
@@ -87,13 +90,18 @@ export class PostulationsService {
     }
   }
 
-  async create(data: CreatePostulationDto, studentId: string) {
-    return this.prismaService.postulation.create({
-      data: {
-        ...data,
-        studentId
-      }
-    });
+  async create(data: CreatePostulationDto, cv: Express.Multer.File, studentId: string) {
+    const url = uuidv4() + `.${cv.originalname.split('.').pop()}`
+    return this.prismaService.$transaction(async (tx) => {
+      await this.s3Service.uploadCV(url, cv.buffer);
+      return await tx.postulation.create({
+        data: {
+          ...data,
+          urlCV: url,
+          studentId
+        }
+      });
+    })
   }
 
   async remove(studentId: string, postulationId: string) {
