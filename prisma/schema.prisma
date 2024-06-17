@@ -186,7 +186,7 @@ model Form {
   id        String @id @default(uuid())
   name      String?
   description String?
-  code     String
+  code     String @unique
 
   studentForms StudenForm[]
 
@@ -208,6 +208,8 @@ model StudenForm {
 
   form      Form @relation(fields: [formId], references: [id])
   formId    String  @map("form_id")
+
+  formContents FormContent[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -381,4 +383,69 @@ model Postulation {
 
   @@unique([studentId, publicationId])
   @@map("postulations")
+}
+
+// Practices Form
+
+model FormContent {
+  id        String @id @default(uuid())
+  businessData Json 
+  studentData Json
+  internshipData Json
+  subjectsData Json
+  scheduleData Json
+  activitiesData Json
+  signatureData Json
+
+  studentForm      StudenForm @relation(fields: [studentFormId], references: [id])
+  studentFormId    String @map("student_form_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("form_contents")
+}
+
+model Subject {
+  id        String @id @default(uuid())
+  name      String @unique
+  code      String @unique
+  description String?
+
+  careersSubjects SubjectCareer[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("subjects")
+}
+
+model Career {
+  id        String @id @default(uuid())
+  name      String @unique
+  description String?
+
+  careersSubjects SubjectCareer[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("careers")
+}
+
+model SubjectCareer {
+  id        String @id @default(uuid())
+
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  subjectId String @map("subject_id")
+
+  career    Career @relation(fields: [careerId], references: [id])
+  careerId  String @map("career_id")
+
+  semester  Int
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("subject_careers")
 }
