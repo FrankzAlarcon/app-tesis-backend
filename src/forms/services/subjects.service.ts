@@ -12,12 +12,47 @@ export class SubjectsService {
     return this.prismaService.subject.findMany()
   }
 
+  async getAllOrdered(careerId: string) {
+    const subjects = await this.prismaService.subject.findMany({
+      include: {
+        careersSubjects: {
+          where: {
+            careerId
+          },
+          select: {
+            semester: true,
+          }
+        }
+      }
+    })
+    const mappedSubjects = subjects.map((subject) => ({
+      id: subject.id,
+      name: subject.name,
+      code: subject.code,
+      semester: subject.careersSubjects[0].semester
+    }))
+
+    //ordered by semester in array of arrays
+    const orderedSubjects = mappedSubjects.reduce((acc, subject) => {
+      const index = subject.semester - 1
+      if (!acc[index]) {
+        acc[index] = []
+      }
+      acc[index].push(subject)
+      return acc
+    }, [])
+
+
+    return orderedSubjects
+  }
+
   async create(data: CreateSubjectDto) {
     const { careerId, semester, ...rest } = data
     return this.prismaService.$transaction(async (tx) => {
       const subject = await tx.subject.create({
         data: {
-          ...rest,
+          name: rest.name,
+          code: rest.code,
         }
       })
       await tx.subjectCareer.create({
@@ -35,9 +70,11 @@ export class SubjectsService {
     return this.prismaService.$transaction(async (tx) => {
       const subjects = await Promise.all(data.map(async (subject) => {
         const { careerId, semester, ...rest } = subject
+        console.log('subject', subject)
         const createdSubject = await tx.subject.create({
           data: {
-            ...rest,
+            name: rest.name,
+            code: rest.code,
           }
         })
         await tx.subjectCareer.create({
@@ -52,6 +89,8 @@ export class SubjectsService {
       )
 
       return subjects
+    }, {
+      timeout: 1000 * 60 * 2
     })    
   }
 

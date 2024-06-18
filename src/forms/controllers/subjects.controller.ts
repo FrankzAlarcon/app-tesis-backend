@@ -20,6 +20,14 @@ export class SubjectsController {
     return this.subjectsService.getAll()
   }
 
+  @Get('/ordered/:careerId')
+  @Roles(Role.ADMIN, Role.STUDENT)
+  async getAllOrdered(
+    @Param('careerId') careerId: string
+  ) {
+    return this.subjectsService.getAllOrdered(careerId)
+  }
+
   @Post()
   @Roles(Role.ADMIN)
   async create(
