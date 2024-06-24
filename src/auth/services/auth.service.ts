@@ -7,7 +7,6 @@ import { CreateStudentDto } from '@/users/dtos/student.dto';
 import { Role } from '@/global/enums/roles.enum';
 import { CreateBusinessDto } from '@/users/dtos/business.dto';
 import { v4 as uuidv4 } from 'uuid';
-
 import * as bcrypt from 'bcrypt';
 
 @Injectable()

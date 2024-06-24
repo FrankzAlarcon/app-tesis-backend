@@ -3,6 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePublicationDto } from '../dtos/publications.dto';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { PaginationService } from '@/database/services/pagination.service';
+import { PostulationStatus } from '@prisma/client';
 
 @Injectable()
 export class PublicationsService {
@@ -65,7 +66,7 @@ export class PublicationsService {
   }
 
   async getFewByBusiness(businessId: string) {
-    return this.prismaService.publication.findMany({
+    const publications = await this.prismaService.publication.findMany({
       where: { businessId },
       orderBy: { createdAt: 'desc' },
       select: {
@@ -74,8 +75,21 @@ export class PublicationsService {
         modality: true,
         createdAt: true,
         updatedAt: true,
+        postulations: {
+          where: { status: PostulationStatus.PENDIENTE },
+          select: {
+            id: true
+          }
+        }
       },
       take: 4      
+    })
+    return publications.map(p => {
+      const { postulations, ...rest } = p
+      return {
+        ...rest,
+        postulationsCount: postulations.length
+      }
     })
   }
 

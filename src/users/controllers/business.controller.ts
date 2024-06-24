@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { BusinessService } from '../services/business.service';
 // import { CreateBusinessDto } from '../dtos/business.dto';
 import { AuthGuard } from '@/global/guards/auth.guard';
@@ -89,7 +89,7 @@ export class BusinessController {
   }
 
   // ** POST Methods **
-  @Post('/complete-profile')
+  @Put('/complete-profile')
   @Roles(Role.ADMIN, Role.BUSINESS)
   async completeProfile(
     @Req() req: any,
