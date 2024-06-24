@@ -1,5 +1,5 @@
 import { PrismaService } from '@/database/services/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePublicationDto } from '../dtos/publications.dto';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { PaginationService } from '@/database/services/pagination.service';
@@ -11,7 +11,7 @@ export class PublicationsService {
     private readonly paginationService: PaginationService
   ) {}
 
-  async getAll(studentId: string, params: PaginationQueryDto) {
+  async getFeed(studentId: string, params: PaginationQueryDto) {
     const business = await this.paginationService.paginate(
       this.prismaService.publication,
       params,
@@ -44,6 +44,39 @@ export class PublicationsService {
       ...business,
       data: publications
     }
+  }
+
+  async getAllByBusiness(businessId: string, params: PaginationQueryDto) {
+    return await this.paginationService.paginate(
+      this.prismaService.publication,
+      params,
+      { businessId },
+      {
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          modality: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      }
+    )
+  }
+
+  async getFewByBusiness(businessId: string) {
+    return this.prismaService.publication.findMany({
+      where: { businessId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        modality: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      take: 4      
+    })
   }
 
   async getAllBookmarkedByStudent(studentId: string, params: PaginationQueryDto) {
@@ -102,8 +135,50 @@ export class PublicationsService {
       publication,
       wasAlreadyPostulated: !!wasAlreadyPostulated
     }
+  }
 
+  async getOneByBusiness(businessId: string, publicationId: string) {
+    const publication = await this.prismaService.publication.findUnique({
+      where: { id: publicationId, businessId }
+    })
+    if (!publication) {
+      throw new NotFoundException('Publication not found')
+    }
+    const postulations = await this.prismaService.postulation.findMany({
+      where: { publicationId: publication.id },
+      select: {
+        id: true,
+        urlCV: true,
+        status: true,
+        student: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                name: true,
+                email: true,
+              }
+            },
+          }
+        },
+        createdAt: true
+      }
+    })
+    const mappedPostulations = postulations.map(p => {
+      const { user, ...rest } = p.student
+      return {
+        ...p,
+        student: {
+          ...rest,
+          ...user
+        }
+      }
+    })
 
+    return {
+      ...publication,
+      postulations: mappedPostulations
+    }
   }
 
   async getLast() {
@@ -137,8 +212,23 @@ export class PublicationsService {
         }
       });
 
+      const newSkills = []
+      for (const skillId of data.notRegisteredSkills) {
+        const skill = await tx.skill.create({
+          data: {
+            name: skillId
+          },
+          select: {
+            id: true
+          }
+        })
+        newSkills.push(skill.id)
+      }
+
+      const allSkillsIds = [...skillsIds, ...newSkills]
+
       await tx.publicationSkill.createMany({
-        data: skillsIds.map(skillId => ({
+        data: allSkillsIds.map(skillId => ({
           publicationId: publication.id,
           skillId: skillId
         }))

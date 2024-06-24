@@ -111,6 +111,7 @@ model Business {
   province  String?
   city      String?
   phone     String?
+  shortPresentation String? @map("short_presentation")
   description String?
   hasCovenant     Boolean @map("has_covenant") @default(false)
 

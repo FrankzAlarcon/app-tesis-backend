@@ -45,4 +45,8 @@ export class CreatePublicationDto {
   @IsArray()
   @IsString({ each: true })
   skillsIds: string[];
+
+  @IsArray()
+  @IsString({ each: true })
+  notRegisteredSkills: string[];
 }

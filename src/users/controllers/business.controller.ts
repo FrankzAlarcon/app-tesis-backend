@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { BusinessService } from '../services/business.service';
 // import { CreateBusinessDto } from '../dtos/business.dto';
 import { AuthGuard } from '@/global/guards/auth.guard';
@@ -8,7 +8,6 @@ import { Role } from '@/global/enums/roles.enum';
 import { CompleteProfileDto } from '../dtos/business.dto';
 import { JwtPayload } from '@/global/interfaces/jwt.interface';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
-import { UsersService } from '../services/users.service';
 
 @ApiTags('Business')
 @Controller('business')
@@ -16,15 +15,9 @@ import { UsersService } from '../services/users.service';
 export class BusinessController {
   constructor(
     private readonly businessService: BusinessService,
-    private readonly usersService: UsersService
   ) {}
 
-  // async create(
-  //   @Body() data: CreateBusinessDto
-  // ) {
-  //   return this.businessService.create(data);
-  // }
-
+  // ** GET Methods **
   @Get()
   @Roles(Role.ADMIN)
   async getAll(
@@ -57,6 +50,45 @@ export class BusinessController {
     return this.businessService.getShortInformation(businessId);
   }
 
+  @Get('/profile')
+  @Roles(Role.ADMIN, Role.BUSINESS)
+  async getProfile(
+    @Req() req: any
+  ) {
+    const user = req.user as JwtPayload;
+    if (!user.businessId) {
+      throw new BadRequestException('Business not found');
+    }
+    return this.businessService.getProfile(user.businessId);
+  }
+
+  @Get('/publications')
+  @Roles(Role.ADMIN, Role.BUSINESS)
+  async getPublications(
+    @Req() req: any,
+    @Query() params: PaginationQueryDto
+  ) {
+    const user = req.user as JwtPayload;
+    if (!user.businessId) {
+      throw new BadRequestException('Business not found');
+    }
+    return this.businessService.getPublications(user.businessId, params);
+  }
+
+  @Get('/publications/:publicationId')
+  @Roles(Role.ADMIN, Role.BUSINESS)
+  async getOnePublication(
+    @Req() req: any,
+    @Param('publicationId') publicationId: string
+  ) {
+    const user = req.user as JwtPayload;
+    if (!user.businessId) {
+      throw new BadRequestException('Business not found');
+    }
+    return this.businessService.getOnePublication(user.businessId, publicationId);
+  }
+
+  // ** POST Methods **
   @Post('/complete-profile')
   @Roles(Role.ADMIN, Role.BUSINESS)
   async completeProfile(

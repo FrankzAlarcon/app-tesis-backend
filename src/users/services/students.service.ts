@@ -18,7 +18,7 @@ export class StudentsService {
 
   async getFeed(studentId: string, params: PaginationQueryDto) {
     // TODO: get publications by student interests
-    return this.publicationsService.getAll(studentId, params)
+    return this.publicationsService.getFeed(studentId, params)
   }
 
   async getBookmarks(studentId: string, params: PaginationQueryDto) {

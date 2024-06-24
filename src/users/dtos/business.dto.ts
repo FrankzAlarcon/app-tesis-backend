@@ -34,5 +34,9 @@ export class CompleteProfileDto {
 
   @IsString()
   @IsOptional()
+  shortPresentation?: string
+
+  @IsString()
+  @IsOptional()
   description?: string
 }

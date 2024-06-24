@@ -31,21 +31,53 @@ export class BusinessService {
     )
   }
 
+  
   async getAllWithoutCovenant(params: PaginationQueryDto) {
     return this.paginationService.paginate(this.prismaService.business, params, { hasCovenant: false })
   }
-
+  
   async getAllForumByBusiness(businessId: string, params: PaginationQueryDto) {
     return this.paginationService.paginate(this.prismaService.forum, params, { businessId })
   }
 
+  
   async getShortInformation(businessId: string) {
     return this.prismaService.business.findUnique({
       where: { id: businessId },
       select: { id: true, name: true }
     })
   }
+  
+  async getProfile(businessId: string) {
+    const promises = await Promise.all([
+      this.prismaService.business.findUnique({
+        where: { id: businessId },
+        select: {
+          id: true,
+          name: true,
+          province: true,
+          city: true,
+          description: true,
+          shortPresentation: true
+        }
+      }),
+      this.publicationService.getFewByBusiness(businessId)
+    ])
+    const [business, publications] = promises
+    return {
+      ...business,
+      publications
+    }
+  }
 
+  async getPublications(businessId: string, params: PaginationQueryDto) {
+    return this.publicationService.getAllByBusiness(businessId, params)
+  }
+
+  async getOnePublication(businessId: string, publicationId: string) {
+    // TODO: add recommended students
+    return this.publicationService.getOneByBusiness(businessId, publicationId)
+  }
   // This method is used on
   async create(data: CreateBusinessDto) {
     // TODO: add email validation, and those things
@@ -108,7 +140,8 @@ export class BusinessService {
         province: data.province,
         city: data.city,
         phone: data.phone,
-        description: data.description
+        description: data.description,
+        shortPresentation: data.shortPresentation
       }
     })
   }
