@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, Length } from "class-validator"
+import { CustomStringLength } from "@/global/validators/custom-string-length"
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Validate } from "class-validator"
 
 export class CreateBusinessDto {
   @IsString()
@@ -28,8 +29,8 @@ export class CompleteProfileDto {
   city?: string
 
   @IsString()
-  @Length(10)
   @IsOptional()
+  @Validate(CustomStringLength)
   phone?: string
 
   @IsString()
