@@ -212,11 +212,13 @@ export class PublicationsService {
     }))
     const mappedPostulations = postulations.map(p => {
       const { user, ...rest } = p.student
+      const { student, ...restOfUser } = user
       return {
         ...p,
         student: {
           ...rest,
-          ...user
+          ...restOfUser,
+          ...student
         }
       }
     })
