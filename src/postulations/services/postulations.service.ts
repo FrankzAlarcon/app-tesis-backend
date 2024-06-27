@@ -11,7 +11,7 @@ export class PostulationsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly paginationService: PaginationService,
-    private readonly s3Service: S3Service
+    private readonly s3Service: S3Service,
   ) {}
 
   async getAll(params: PaginationQueryDto) {

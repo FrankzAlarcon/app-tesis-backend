@@ -9,7 +9,9 @@ import {
   Put,
   Query,
   Req,
-  UseGuards
+  UploadedFile,
+  UseGuards,
+  UseInterceptors
 } from '@nestjs/common';
 import { StudentsService } from '../services/students.service';
 import { CompleteStudentProfileDto, CreateStudentDto } from '../dtos/student.dto';
@@ -20,6 +22,7 @@ import { AuthGuard } from '@/global/guards/auth.guard';
 import { JwtPayload } from '@/global/interfaces/jwt.interface';
 import { ProfileService } from '../services/student-profile/profile.service';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Students')
 @UseGuards(AuthGuard)
@@ -79,6 +82,17 @@ export class StudentsController {
     @Body() data: CreateStudentDto
   ) {
     return await this.studentsService.create(data)
+  }
+
+  @Put('/update-image-profile')
+  @Roles(Role.STUDENT)
+  @UseInterceptors(FileInterceptor('image'))
+  async updateImageProfile(
+    @Req() req: any,
+    @UploadedFile() image: Express.Multer.File
+  ) {
+    const user = req.user as JwtPayload
+    return this.studentsService.updateImage(user.studentId, image)
   }
 
   @Put('/complete-profile')

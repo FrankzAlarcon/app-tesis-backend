@@ -6,6 +6,8 @@ import { Role } from '@/global/enums/roles.enum';
 import { PublicationsService } from '@/publications/services/publications.service';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { ForumService } from '@/publications/services/forum.service';
+import { S3Service } from '@/database/services/s3.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class StudentsService {
@@ -13,7 +15,8 @@ export class StudentsService {
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
     private readonly publicationsService: PublicationsService,
-    private readonly forumService: ForumService
+    private readonly forumService: ForumService,
+    private readonly s3Service: S3Service
   ) {}
 
   async getFeed(studentId: string, params: PaginationQueryDto) {
@@ -80,6 +83,35 @@ export class StudentsService {
     return this.prismaService.student.update({
       where: { id },
       data
+    })
+  }
+
+  async updateImage(studentId: string, image: Express.Multer.File) {
+    const imageUrl = `${uuidv4()}.${image.mimetype.split('/')[1]}`
+    return this.prismaService.$transaction(async () => {
+      await this.s3Service.uploadProfileImage(imageUrl, image.buffer)
+      const student = await this.prismaService.student.findUnique({
+        where: { id: studentId },
+        select: {
+          id: true,
+          imageUrl: true
+        }
+      })
+
+      if (!student) {
+        throw new BadRequestException('Student not found')
+      }
+
+      if (student.imageUrl) {
+        await this.s3Service.removeProfileImage(student.imageUrl)
+      }
+
+      return await this.prismaService.student.update({
+        where: { id: studentId },
+        data: {
+          imageUrl
+        }
+      })
     })
   }
 }

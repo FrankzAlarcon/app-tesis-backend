@@ -34,9 +34,9 @@ export class CreatePublicationDto {
   @IsNotEmpty()
   requirements: string
 
-  @IsString()
-  @IsOptional()
-  url?: string;
+  // @IsString()
+  // @IsOptional()
+  // imageUrl?: string;
 
   @IsNumberString()
   @IsOptional()

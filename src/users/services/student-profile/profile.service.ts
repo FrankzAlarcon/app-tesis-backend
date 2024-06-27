@@ -2,13 +2,15 @@ import { PrismaService } from '@/database/services/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CertificationsService } from './certifications.service';
+import { S3Service } from '@/database/services/s3.service';
 
 @Injectable()
 export class ProfileService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly projectsService: ProjectsService,
-    private readonly certificationsService: CertificationsService
+    private readonly certificationsService: CertificationsService,
+    private readonly s3Service: S3Service
   ){ }
 
   //TODO: Add Registro de Practas info
@@ -23,7 +25,7 @@ export class ProfileService {
           description: true,
           faculty: true,
           ira: true,
-  
+          imageUrl: true,
           user: {
             select: {
               email: true,
@@ -38,6 +40,9 @@ export class ProfileService {
 
     const [student, projects, certifications] = promises;
     const {user, ...rest} = student
+    const rt = await this.s3Service.getSignedUrlObject(student.imageUrl)
+    
+    rest.imageUrl = rt
     return {
       ...user,
       ...rest,

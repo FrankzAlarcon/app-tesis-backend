@@ -9,7 +9,9 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UploadedFile,
+  UseGuards,
+  UseInterceptors
 } from '@nestjs/common';
 import { PublicationsService } from '../services/publications.service';
 import { Roles } from '@/global/decorators/role.decorator';
@@ -19,6 +21,7 @@ import { CreatePublicationDto } from '../dtos/publications.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Publications')
 @UseGuards(AuthGuard)
@@ -59,16 +62,20 @@ export class PublicationsController {
 
   @Post()
   @Roles(Role.BUSINESS)
+  @UseInterceptors(FileInterceptor('image'))
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Req() req: any,
-    @Body() data: CreatePublicationDto
+    @Body() data: CreatePublicationDto,
+    @UploadedFile() image: Express.Multer.File
   ) {
     const user = req.user as JwtPayload;
     if (!user.businessId) {
       throw new BadRequestException('User does not have a business');
     }
-    return this.publicationsService.create(data, user.businessId);
+    console.log(data, image, user.businessId)
+    // return true
+    return this.publicationsService.create(data, image, user.businessId);
   }
 
 }
