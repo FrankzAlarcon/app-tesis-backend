@@ -90,11 +90,14 @@ export class PublicationsService {
       },
       take: 4      
     })
+    // TODO: Recomendaciones
+    const candidatesCount = 0
     return publications.map(p => {
       const { postulations, ...rest } = p
       return {
         ...rest,
-        postulationsCount: postulations.length
+        postulationsCount: postulations.length,
+        candidatesCount,
       }
     })
   }
@@ -185,26 +188,46 @@ export class PublicationsService {
       publication.imageUrl = signedUrl
     }
 
-    const postulations = await this.prismaService.postulation.findMany({
-      where: { publicationId: publication.id },
-      select: {
-        id: true,
-        urlCV: true,
-        status: true,
-        student: {
-          select: {
-            id: true,
-            user: {
-              select: {
-                name: true,
-                email: true,
-              }
-            },
+    const [postulations, publicationSkills] = await Promise.all([
+      this.prismaService.postulation.findMany({
+        where: { publicationId: publication.id },
+        select: {
+          id: true,
+          urlCV: true,
+          status: true,
+          student: {
+            select: {
+              id: true,
+              user: {
+                select: {
+                  name: true,
+                  email: true,
+                }
+              },
+            }
+          },
+          createdAt: true
+        }
+      }),
+      this.prismaService.publicationSkill.findMany({
+        where: { publicationId: publication.id },
+        select: {
+          id: true,
+          skill: {
+            select: {
+              id: true,
+              name: true
+            }
           }
-        },
-        createdAt: true
-      }
-    })
+        }
+      })
+    ])
+    // TODO: Return skills
+    const mappedSkills = publicationSkills.map(ps => ({
+      publicationSkillId: ps.id,
+      skillId: ps.skill.id,
+      name: ps.skill.name
+    }))
     const mappedPostulations = postulations.map(p => {
       const { user, ...rest } = p.student
       return {
@@ -218,7 +241,8 @@ export class PublicationsService {
 
     return {
       ...publication,
-      postulations: mappedPostulations
+      postulations: mappedPostulations,
+      skills: mappedSkills
     }
   }
 

@@ -12,6 +12,10 @@ import {
 export class CreatePublicationDto {
   @IsString()
   @IsNotEmpty()
+  title: string;
+
+  @IsString()
+  @IsNotEmpty()
   description: string;
 
   @IsEnum(Modality)
