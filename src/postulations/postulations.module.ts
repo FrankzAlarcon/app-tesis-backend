@@ -4,6 +4,7 @@ import { PostulationsController } from './controllers/postulations.controller';
 
 @Module({
   providers: [PostulationsService],
-  controllers: [PostulationsController]
+  controllers: [PostulationsController],
+  exports: [PostulationsService]
 })
 export class PostulationsModule {}

@@ -34,8 +34,6 @@ export class S3Service {
     })
     const response = await this.signUrl(command, options)
 
-    console.log('get Signed Url Object | output', response)
-
     return response
   }
 

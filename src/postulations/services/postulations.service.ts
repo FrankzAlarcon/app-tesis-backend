@@ -92,6 +92,43 @@ export class PostulationsService {
     }
   }
 
+  async getPostulationsByPublication(publicationId: string) {
+    const postulations = await this.prismaService.postulation.findMany({
+      where: { publicationId },
+      select: {
+        id: true,
+        urlCV: true,
+        status: true,
+        student: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                name: true,
+                email: true,
+                student: {
+                  select: {
+                    imageUrl: true
+                  }
+                }
+              }
+            },
+          }
+        },
+        createdAt: true
+      }
+    })
+
+    const mappedPostulations = Promise.all(postulations.map(async (postulation) => {
+      if (!postulation.student.user.student.imageUrl) return postulation
+      const signedUrl = await this.s3Service.getSignedUrlObject(postulation.student.user.student.imageUrl)
+      postulation.student.user.student.imageUrl = signedUrl
+      return postulation
+    }))
+
+    return mappedPostulations
+  }
+
   async create(data: CreatePostulationDto, cv: Express.Multer.File, studentId: string) {
     const url = uuidv4() + `.${cv.originalname.split('.').pop()}`
     return this.prismaService.$transaction(async (tx) => {

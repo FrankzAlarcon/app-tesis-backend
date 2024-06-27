@@ -8,14 +8,16 @@ import { ConfigType } from '@nestjs/config';
 import { S3Service } from '@/database/services/s3.service';
 import { v4 as uuidv4 } from 'uuid'
 import config from '@/config';
+import { PostulationsService } from '@/postulations/services/postulations.service';
 
 @Injectable()
 export class PublicationsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly paginationService: PaginationService,
+    private readonly s3Service: S3Service,
+    private readonly postulationsService: PostulationsService,
     @Inject(config.KEY) private readonly configService: ConfigType<typeof config>,
-    private readonly s3Service: S3Service
   ) {}
 
   async getFeed(studentId: string, params: PaginationQueryDto) {
@@ -189,26 +191,7 @@ export class PublicationsService {
     }
 
     const [postulations, publicationSkills] = await Promise.all([
-      this.prismaService.postulation.findMany({
-        where: { publicationId: publication.id },
-        select: {
-          id: true,
-          urlCV: true,
-          status: true,
-          student: {
-            select: {
-              id: true,
-              user: {
-                select: {
-                  name: true,
-                  email: true,
-                }
-              },
-            }
-          },
-          createdAt: true
-        }
-      }),
+      this.postulationsService.getPostulationsByPublication(publicationId),
       this.prismaService.publicationSkill.findMany({
         where: { publicationId: publication.id },
         select: {
@@ -222,7 +205,6 @@ export class PublicationsService {
         }
       })
     ])
-    // TODO: Return skills
     const mappedSkills = publicationSkills.map(ps => ({
       publicationSkillId: ps.id,
       skillId: ps.skill.id,
