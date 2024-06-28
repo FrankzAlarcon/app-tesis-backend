@@ -56,7 +56,7 @@ export class PublicationsService {
   }
 
   async getAllByBusiness(businessId: string, params: PaginationQueryDto) {
-    return await this.paginationService.paginate(
+    const data = await this.paginationService.paginate(
       this.prismaService.publication,
       params,
       { businessId },
@@ -68,9 +68,29 @@ export class PublicationsService {
           modality: true,
           createdAt: true,
           updatedAt: true,
+          postulations: {
+            where: { status: PostulationStatus.PENDIENTE },
+            select: {
+              id: true
+            }
+          }
         }
       }
     )
+    const candidatesCount = 0
+    const mappedData = data.data.map(p => {
+      const { postulations, ...rest } = p
+      return {
+        ...rest,
+        postulationsCount: postulations.length,
+        candidatesCount,
+      }
+    })
+
+    return {
+      ...data,
+      data: mappedData
+    }
   }
 
   async getFewByBusiness(businessId: string) {
