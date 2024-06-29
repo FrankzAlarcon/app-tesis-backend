@@ -62,6 +62,18 @@ export class BusinessController {
     return this.businessService.getProfile(user.businessId);
   }
 
+  @Get('/short-profile')
+  @Roles(Role.BUSINESS)
+  async getShortProfile(
+    @Req() req: any
+  ) {
+    const user = req.user as JwtPayload;
+    if (!user.businessId) {
+      throw new BadRequestException('Business not found');
+    }
+    return this.businessService.getShortProfile(user.businessId);
+  }
+
   @Get('/publications')
   @Roles(Role.ADMIN, Role.BUSINESS)
   async getPublications(

@@ -70,6 +70,20 @@ export class BusinessService {
     }
   }
 
+  async getShortProfile(businessId: string) {
+    return this.prismaService.business.findUnique({
+      where: { id: businessId },
+      select: {
+        id: true,
+        name: true,
+        province: true,
+        shortPresentation: true,
+        city: true,
+        phone: true
+      }
+    })
+  }
+
   async getPublications(businessId: string, params: PaginationQueryDto) {
     return this.publicationService.getAllByBusiness(businessId, params)
   }
