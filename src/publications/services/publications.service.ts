@@ -30,7 +30,8 @@ export class PublicationsService {
           business: {
             select: {
               id: true,
-              name: true
+              name: true,
+              imageUrl: true
             }
           },
         }
@@ -41,13 +42,17 @@ export class PublicationsService {
       where: { studentId, publicationId: { in: business.data.map(p => p.id)}}
     })
 
-    const publications = business.data.map(p => {
+    const publications = await Promise.all(business.data.map(async (p) => {
       const bookmark = studentBookmarks.find(b => b.publicationId === p.id)
+      if (p.business.imageUrl) {
+        const signedUrl = await this.s3Service.getSignedUrlObject(p.business.imageUrl, {}, this.configService.aws.imageProfileBucket)
+        p.business.imageUrl = signedUrl
+      }
       return {
         ...p,
         bookmarked: !!bookmark
       }
-    })
+    }))
 
     return {
       ...business,
