@@ -148,7 +148,7 @@ export class BusinessService {
         data: {
           userId: user.id,
           code: uuidv4(),
-          name: data.businessName,
+          name: data.name,
           hasCovenant: false
         }
       })

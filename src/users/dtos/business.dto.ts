@@ -13,10 +13,6 @@ export class CreateBusinessDto {
   @IsString()
   // @IsStrongPassword({ minLength: 8 })
   password: string
-
-  @IsString()
-  @IsNotEmpty()
-  businessName: string
 }
 
 export class CompleteProfileDto {
