@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -78,4 +79,16 @@ export class PublicationsController {
     return this.publicationsService.create(data, image, user.businessId);
   }
 
+  @Delete(':publicationId')
+  @Roles(Role.BUSINESS)
+  async remove(
+    @Req() req: any,
+    @Param('publicationId') publicationId: string
+  ) {
+    const user = req.user as JwtPayload;
+    if (!user.businessId) {
+      throw new BadRequestException('User does not have a business');
+    }
+    return this.publicationsService.remove(publicationId, user.businessId);
+  }
 }

@@ -104,4 +104,13 @@ export class S3Service {
       })
     )
   }
+
+  async removePublicationImage(filename: string, bucket?: string) {
+    return await this.s3Service.send(
+      new DeleteObjectCommand({
+        Bucket: bucket ?? this.configService.aws.publicationImageBucket,
+        Key: filename
+      })
+    )
+  }
 }

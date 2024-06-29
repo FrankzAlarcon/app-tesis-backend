@@ -324,4 +324,31 @@ export class PublicationsService {
       return publication;
     })
   }
+
+  async remove(publicationId: string, businessId: string) {
+    return this.prismaService.$transaction(async (tx) => {
+      const publication = await tx.publication.findUnique({
+        where: { id: publicationId, businessId },
+        select: {
+          imageUrl: true,
+        }
+      })
+  
+      if (!publication) {
+        throw new NotFoundException('Publication not found')
+      }
+  
+      await tx.publicationSkill.deleteMany({
+        where: { publicationId }
+      })
+  
+      if (publication.imageUrl) {
+        await this.s3Service.removePublicationImage(publication.imageUrl)
+      }
+  
+      return tx.publication.delete({
+        where: { id: publicationId }
+      })
+    })
+  }
 }
