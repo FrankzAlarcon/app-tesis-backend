@@ -75,6 +75,14 @@ export class BusinessController {
     return this.businessService.getShortProfile(user.businessId);
   }
 
+  @Get('/public/short-profile/:businessId')
+  @Roles(Role.STUDENT, Role.BUSINESS, Role.ADMIN)
+  async getPublicShortProfile(
+    @Param('businessId') businessId: string
+  ) {
+    return this.businessService.getShortProfile(businessId);
+  }
+
   @Get('/publications')
   @Roles(Role.ADMIN, Role.BUSINESS)
   async getPublications(

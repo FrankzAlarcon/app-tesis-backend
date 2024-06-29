@@ -3,12 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { CreateForumDto } from '../dtos/forum.dto';
 import { PaginationService } from '@/database/services/pagination.service';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
+import { S3Service } from '@/database/services/s3.service';
 
 @Injectable()
 export class ForumService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly paginationService: PaginationService
+    private readonly paginationService: PaginationService,
+    private readonly s3Service: S3Service
   ) {}
 
   async getAllGroupByBusiness(params: PaginationQueryDto) {
@@ -30,19 +32,24 @@ export class ForumService {
       select: {
         id: true,
         name: true,
-        description: true
+        shortPresentation: true,
+        imageUrl: true
       }
     })
-    const mappedData = forumsByBusiness.data.map((forum: any) => {
+    const mappedData = await Promise.all(forumsByBusiness.data.map(async (forum: any) => {
       const businessFind = business.find((b) => b.id === forum.businessId)
+      if (businessFind?.imageUrl) {
+        businessFind.imageUrl = await this.s3Service.getSignedUrlObject(businessFind.imageUrl)
+      }
       return {
         businessId: forum.businessId,
         businessName: businessFind?.name,
-        businessDescription: businessFind?.description,
+        businessDescription: businessFind?.shortPresentation,
+        businessImageUrl: businessFind?.imageUrl,
         count: forum._count.id,
         avgGrade: forum._avg.grade
       }
-    })
+    }))
 
     return {
       ...forumsByBusiness,
@@ -51,7 +58,7 @@ export class ForumService {
   }
 
   async getAllByBusiness(businessId: string, params: PaginationQueryDto) {
-    return await this.paginationService.paginate(
+    const response = await this.paginationService.paginate(
       this.prismaService.forum,
       params,
       { businessId },
@@ -60,9 +67,10 @@ export class ForumService {
           student: {
             select: {
               id: true,
+              imageUrl: true,
               user: {
                 select: {
-                  name: true
+                  name: true,
                 }
               }
             }
@@ -70,10 +78,21 @@ export class ForumService {
         }
       }	
     )
+    const data = await Promise.all(response.data.map(async (forum) => {
+      if (forum.student.imageUrl) {
+        forum.student.imageUrl = await this.s3Service.getSignedUrlObject(forum.student.imageUrl)
+      }
+      return forum
+    }))
+
+    return {
+      ...response,
+      data
+    }
   }
 
   async getAllByStudent(studentId: string, params: PaginationQueryDto) {
-    return await this.paginationService.paginate(
+    const response = await this.paginationService.paginate(
       this.prismaService.forum,
       params,
       { studentId },
@@ -82,6 +101,7 @@ export class ForumService {
           student: {
             select: {
               id: true,
+              imageUrl: true,
               user: {
                 select: {
                   name: true
@@ -92,6 +112,17 @@ export class ForumService {
         }
       }	
     )
+    const data = await Promise.all(response.data.map(async (forum) => {
+      if (forum.student.imageUrl) {
+        forum.student.imageUrl = await this.s3Service.getSignedUrlObject(forum.student.imageUrl)
+      }
+      return forum
+    }))
+
+    return {
+      ...response,
+      data
+    }
   }
 
   async create(data: CreateForumDto, studentId: string) {

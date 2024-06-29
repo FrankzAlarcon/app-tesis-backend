@@ -41,7 +41,8 @@ export class PostulationsService {
               select: {
                 id: true,
                 name: true,
-                province: true
+                province: true,
+                imageUrl: true
               }
             }
           }
@@ -49,8 +50,11 @@ export class PostulationsService {
       }
     })
 
-    const mappedPostulations = postulations.map((postulation) => ({
-      ...postulation.publication
+    const mappedPostulations = await Promise.all(postulations.map(async (postulation) => {
+      if (postulation.publication.business.imageUrl) {
+        postulation.publication.business.imageUrl = await this.s3Service.getSignedUrlObject(postulation.publication.business.imageUrl)
+      }
+      return postulation.publication
     }))
 
     return mappedPostulations
@@ -73,7 +77,8 @@ export class PostulationsService {
               business: {
                 select: {
                   name: true,
-                  province: true
+                  province: true,
+                  imageUrl: true
                 }
               }
             }
@@ -81,9 +86,14 @@ export class PostulationsService {
         }
       }
     )
-    const mappedPostulations = postulations.data.map((postulation) => ({
-      ...postulation.publication,
-      postulationId: postulation.id
+    const mappedPostulations = await Promise.all(postulations.data.map(async (postulation) => {
+      if (postulation.publication.business.imageUrl) {
+        postulation.publication.business.imageUrl = await this.s3Service.getSignedUrlObject(postulation.publication.business.imageUrl)
+      }
+      return ({
+        ...postulation.publication,
+        postulationId: postulation.id
+      })
     }))
 
     return {

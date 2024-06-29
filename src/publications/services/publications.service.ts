@@ -256,7 +256,7 @@ export class PublicationsService {
   }
 
   async getLast() {
-    return this.prismaService.publication.findMany({
+    const publications = await this.prismaService.publication.findMany({
       take: 2,
       orderBy: { createdAt: 'desc' },
       select: {
@@ -268,11 +268,21 @@ export class PublicationsService {
           select: {
             id: true,
             name: true,
-            province: true
+            province: true,
+            imageUrl: true
           }
         }
       }
     })
+
+    const mappedPublications = await Promise.all(publications.map(async (publication) => {
+      if (publication.business.imageUrl) {
+        publication.business.imageUrl = await this.s3Service.getSignedUrlObject(publication.business.imageUrl)
+      }
+      return publication
+    }))
+
+    return mappedPublications
   }
 
   async create(data: CreatePublicationDto, image: Express.Multer.File, businessId: string) {
