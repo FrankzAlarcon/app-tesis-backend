@@ -171,7 +171,8 @@ export class PublicationsService {
         business: {
           select: {
             id: true,
-            name: true
+            name: true,
+            imageUrl: true
           },
         },
       }
@@ -187,6 +188,14 @@ export class PublicationsService {
         throw new NotFoundException('Publication image not found')
       }
       publication.imageUrl = signedUrl
+    }
+
+    if (publication.business.imageUrl) {
+      const signedUrl = await this.s3Service.getSignedUrlObject(publication.business.imageUrl, {}, this.configService.aws.imageProfileBucket)
+      if (!signedUrl) {
+        throw new NotFoundException('Business image not found')
+      }
+      publication.business.imageUrl = signedUrl
     }
 
 
