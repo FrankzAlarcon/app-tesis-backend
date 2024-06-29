@@ -86,7 +86,7 @@ export class StudentsService {
     })
   }
 
-  async updateImage(studentId: string, image: Express.Multer.File) {
+  async updateImageProfile(studentId: string, image: Express.Multer.File) {
     const imageUrl = `${uuidv4()}.${image.mimetype.split('/')[1]}`
     return this.prismaService.$transaction(async () => {
       await this.s3Service.uploadProfileImage(imageUrl, image.buffer)

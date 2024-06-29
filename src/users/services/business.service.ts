@@ -60,12 +60,19 @@ export class BusinessService {
           province: true,
           city: true,
           description: true,
-          shortPresentation: true
+          shortPresentation: true,
+          imageUrl: true,
         }
       }),
       this.publicationService.getFewByBusiness(businessId)
     ])
     const [business, publications] = promises
+    if (!business) {
+      throw new BadRequestException('Business not found')
+    }
+    if (business.imageUrl) {
+      business.imageUrl = await this.s3Service.getSignedUrlObject(business.imageUrl)
+    }
     return {
       ...business,
       publications
@@ -206,6 +213,33 @@ export class BusinessService {
       })
 
       return businessWithCovenant
+    })
+  }
+
+  async updateImageProfile(businessId: string, image: Express.Multer.File) {
+    const imageUrl = `${uuidv4()}.${image.mimetype.split('/')[1]}`
+    return this.prismaService.$transaction(async () => {
+      await this.s3Service.uploadProfileImage(imageUrl, image.buffer)
+      const business = await this.prismaService.business.findUnique({
+        where: { id: businessId },
+        select: {
+          id: true,
+          imageUrl: true
+        }
+      })
+
+      if (!business) {
+        throw new BadRequestException('Business not found')
+      }
+
+      if (business.imageUrl) {
+        await this.s3Service.removeProfileImage(business.imageUrl)
+      }
+
+      return this.prismaService.business.update({
+        where: { id: businessId },
+        data: { imageUrl }
+      })
     })
   }
 

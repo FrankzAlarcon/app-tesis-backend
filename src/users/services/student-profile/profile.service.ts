@@ -37,12 +37,11 @@ export class ProfileService {
       this.projectsService.getByStudent(studentId),
       this.certificationsService.getByStudent(studentId)
     ])
-
     const [student, projects, certifications] = promises;
     const {user, ...rest} = student
-    const rt = await this.s3Service.getSignedUrlObject(student.imageUrl)
-    
-    rest.imageUrl = rt
+    if (student.imageUrl) {
+      rest.imageUrl = await this.s3Service.getSignedUrlObject(student.imageUrl)
+    }
     return {
       ...user,
       ...rest,

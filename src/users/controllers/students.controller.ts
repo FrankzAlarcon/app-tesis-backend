@@ -92,7 +92,7 @@ export class StudentsController {
     @UploadedFile() image: Express.Multer.File
   ) {
     const user = req.user as JwtPayload
-    return this.studentsService.updateImage(user.studentId, image)
+    return this.studentsService.updateImageProfile(user.studentId, image)
   }
 
   @Put('/complete-profile')

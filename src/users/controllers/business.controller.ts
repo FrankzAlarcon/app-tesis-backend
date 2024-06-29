@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { BusinessService } from '../services/business.service';
 // import { CreateBusinessDto } from '../dtos/business.dto';
 import { AuthGuard } from '@/global/guards/auth.guard';
@@ -8,6 +8,7 @@ import { Role } from '@/global/enums/roles.enum';
 import { CompleteProfileDto } from '../dtos/business.dto';
 import { JwtPayload } from '@/global/interfaces/jwt.interface';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Business')
 @Controller('business')
@@ -110,5 +111,16 @@ export class BusinessController {
     // TODO: Verify that is the business owner
     const user = req.user as JwtPayload;
     return this.businessService.completeProfile(user.sub, data);
+  }
+
+  @Put('/update-image-profile')
+  @Roles(Role.BUSINESS)
+  @UseInterceptors(FileInterceptor('image'))
+  async updateImageProfile(
+    @Req() req: any,
+    @UploadedFile() image: Express.Multer.File
+  ) {
+    const user = req.user as JwtPayload;
+    return this.businessService.updateImageProfile(user.businessId, image);
   }
 }
