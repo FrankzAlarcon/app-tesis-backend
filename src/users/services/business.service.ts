@@ -8,6 +8,7 @@ import { PaginationService } from '@/database/services/pagination.service';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { CreateBusinessCovenantDto, RemoveBusinessCovenantDto } from '../dtos/business-covenant.dto';
 import { PublicationsService } from '@/publications/services/publications.service';
+import { S3Service } from '@/database/services/s3.service';
 
 @Injectable()
 export class BusinessService {
@@ -15,7 +16,8 @@ export class BusinessService {
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
     private readonly publicationService: PublicationsService,
-    private readonly paginationService: PaginationService
+    private readonly paginationService: PaginationService,
+    private readonly s3Service: S3Service
   ) {}
 
   async getAll(params: PaginationQueryDto) {
@@ -71,17 +73,28 @@ export class BusinessService {
   }
 
   async getShortProfile(businessId: string) {
-    return this.prismaService.business.findUnique({
+    const business = await this.prismaService.business.findUnique({
       where: { id: businessId },
       select: {
         id: true,
         name: true,
         province: true,
         shortPresentation: true,
+        imageUrl: true,
         city: true,
         phone: true
       }
     })
+
+    if (!business) {
+      throw new BadRequestException('Business not found')
+    }
+
+    if (business.imageUrl) {
+      business.imageUrl = await this.s3Service.getSignedUrlObject(business.imageUrl)
+    }
+
+    return business
   }
 
   async getPublications(businessId: string, params: PaginationQueryDto) {
