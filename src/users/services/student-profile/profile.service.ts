@@ -49,4 +49,40 @@ export class ProfileService {
       certifications
     }
   }
+
+  async getShortProfile(studentId: string) {
+    const promises = await Promise.all([
+      this.prismaService.student.findUnique({
+        where: { id: studentId },
+        select: {
+          id: true,
+          faculty: true,
+          ira: true,
+          shortPresentation: true,
+          imageUrl: true,
+          user: {
+            select: {
+              name: true
+            }
+          }
+        }
+      }),
+      this.prismaService.postulation.count({
+        where: { studentId }
+      })
+    ])
+    const [student, postulationsCount] = promises
+    if (student.imageUrl) {
+      student.imageUrl = await this.s3Service.getSignedUrlObject(student.imageUrl)
+    }
+    const {user, ...rest} = student
+    // TODO: Add reocmendations
+    const recommendedCount = 0
+    return {
+      ...rest,
+      ...user,
+      postulationsCount,
+      recommendedCount
+    }
+  }
 }

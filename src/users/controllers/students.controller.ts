@@ -65,6 +65,15 @@ export class StudentsController {
     return this.profileService.studentProfileInfo(user.studentId)
   }
 
+  @Get('/short-profile')
+  @Roles(Role.STUDENT)
+  async getShortProfile(
+    @Req() req: any
+  ) {
+    const user = req.user as JwtPayload
+    return this.profileService.getShortProfile(user.studentId)
+  }
+
   @Get('/forums')
   @Roles(Role.STUDENT)
   async getForums(
