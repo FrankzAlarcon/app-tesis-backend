@@ -296,7 +296,7 @@ export class PublicationsService {
 
   async create(data: CreatePublicationDto, image: Express.Multer.File | undefined, businessId: string) {
     return this.prismaService.$transaction(async (tx) => {
-      const { skillsIds, remuneration, notRegisteredSkills, ...rest } = data
+      const { remuneration, notRegisteredSkills, skillsIds, ...rest } = data
       let imageUrl = null
       if (image !== undefined) {
         imageUrl = `${uuidv4()}.${image.mimetype.split('/')[1]}`
@@ -339,9 +339,7 @@ export class PublicationsService {
         })
         newSkills.push(skill.id)
       }
-
-      const allSkillsIds = [...skillsIds, ...newSkills]
-
+      const allSkillsIds = [...data.skillsIds, ...newSkills]
       await tx.publicationSkill.createMany({
         data: allSkillsIds.map(skillId => ({
           publicationId: publication.id,
