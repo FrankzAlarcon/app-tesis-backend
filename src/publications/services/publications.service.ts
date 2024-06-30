@@ -311,6 +311,7 @@ export class PublicationsService {
         }
       });
       data.notRegisteredSkills = notRegisteredSkills.filter(skill => skill.trim() !== '')
+      data.skillsIds = skillsIds.filter(skillId => skillId !== '')
       const checkSkills = await tx.skill.findMany({
         where: {
           name: { in: data.notRegisteredSkills }
