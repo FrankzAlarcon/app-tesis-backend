@@ -21,7 +21,7 @@ export class SkillsController {
   }
 
   @Post()
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.STUDENT, Role.BUSINESS)
   async create(
     @Body() data: CreateSkillDto
   ) {
@@ -29,7 +29,7 @@ export class SkillsController {
   }
 
   @Post('/many')
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.STUDENT, Role.BUSINESS)
   async createMany(
     @Body() data: CreateSkillDto[]
   ) {

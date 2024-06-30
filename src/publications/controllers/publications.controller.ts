@@ -68,13 +68,12 @@ export class PublicationsController {
   async create(
     @Req() req: any,
     @Body() data: CreatePublicationDto,
-    @UploadedFile() image: Express.Multer.File
+    @UploadedFile() image: Express.Multer.File | undefined
   ) {
     const user = req.user as JwtPayload;
     if (!user.businessId) {
       throw new BadRequestException('User does not have a business');
     }
-    console.log(data, image, user.businessId)
     // return true
     return this.publicationsService.create(data, image, user.businessId);
   }

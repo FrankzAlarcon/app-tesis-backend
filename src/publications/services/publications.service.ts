@@ -294,11 +294,14 @@ export class PublicationsService {
     return mappedPublications
   }
 
-  async create(data: CreatePublicationDto, image: Express.Multer.File, businessId: string) {
+  async create(data: CreatePublicationDto, image: Express.Multer.File | undefined, businessId: string) {
     return this.prismaService.$transaction(async (tx) => {
       const { skillsIds, remuneration, notRegisteredSkills, ...rest } = data
-      const imageUrl = `${uuidv4()}.${image.mimetype.split('/')[1]}`
-      await this.s3Service.uploadPublicationImage(imageUrl, image.buffer)
+      let imageUrl = null
+      if (image !== undefined) {
+        imageUrl = `${uuidv4()}.${image.mimetype.split('/')[1]}`
+        await this.s3Service.uploadPublicationImage(imageUrl, image.buffer)
+      }
       const publication = await tx.publication.create({
         data: {
           ...rest,
