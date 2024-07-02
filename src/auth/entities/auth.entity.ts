@@ -4,6 +4,8 @@ export class Auth implements AuthEntity {
   id: string;
   password: string;
   token: string | null;
+  resetPasswordToken: string | null;
+  verificationEmailtoken: string | null
   createdAt: Date;
   updatedAt: Date;
 }

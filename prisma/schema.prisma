@@ -17,7 +17,8 @@ datasource db {
 model Auth {
   id        String @id @default(uuid())
   password  String
-  token     String?
+  verificationEmailtoken     String? @map("verification_email_token")
+  resetPasswordToken         String? @map("reset_password_token")
 
   user      User?
 
@@ -32,6 +33,7 @@ model User {
   id        String @id @default(uuid())
   email     String @unique
   name      String
+  emailVerified Boolean @default(false) @map("email_verified")
 
   roles     Role @relation(fields: [roleId], references: [id])
   roleId    String @map("role_id")

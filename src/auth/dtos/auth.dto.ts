@@ -5,6 +5,9 @@ export class CreateAuthDto {
   @IsNotEmpty()
   @IsStrongPassword({ minLength: 8 })
   password: string
+
+  @IsString()
+  token?: string
 }
 
 export class LoginDto {

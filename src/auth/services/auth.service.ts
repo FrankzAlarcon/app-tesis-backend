@@ -8,19 +8,21 @@ import { Role } from '@/global/enums/roles.enum';
 import { CreateBusinessDto } from '@/users/dtos/business.dto';
 import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
+import { EmailService } from './email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly emailService: EmailService
   ) {}
 
   async create(data: CreateAuthDto) {
     const saltOrRounds = 10;
     const hash = await bcrypt.hash(data.password, saltOrRounds);
     return await this.prismaService.auth.create({
-      data: { password: hash }
+      data: { password: hash, verificationEmailtoken: data.token ?? null }
     })
   }
 
@@ -81,7 +83,7 @@ export class AuthService {
   async registerAdmin(data: CreateAdminDto) {
     return this.prismaService.$transaction(async (tx) => {
       const auth = await this.create({
-        password: data.password
+        password: data.password,
       })
 
       const role = await tx.role.findFirst({ where: { name: Role.ADMIN }})
@@ -106,8 +108,10 @@ export class AuthService {
   async registerStudent(data: CreateStudentDto) {
     // TODO: add email validation, and those things
     return this.prismaService.$transaction(async (tx) => {
+      const token = uuidv4().replace(/-/g, '')
       const auth = await this.create({
-        password: data.password
+        password: data.password,
+        token
       })
       const role = await tx.role.findFirst({
         where: { name: Role.STUDENT }
@@ -132,6 +136,8 @@ export class AuthService {
         }
       })
 
+      await this.emailService.sendConfirmEmail(data.name, data.email, token)
+
       return student
     })
   }
@@ -147,8 +153,10 @@ export class AuthService {
     }
 
     return this.prismaService.$transaction(async (tx) => {
+      const token = uuidv4().replace(/-/g, '')
       const auth = await this.create({
-        password: data.password
+        password: data.password,
+        token
       })
       const role = await tx.role.findFirst({
         where: { name: Role.BUSINESS }
@@ -178,5 +186,92 @@ export class AuthService {
 
       return business
     })
+  }
+
+  async resendConfirmEmail(email: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { email: email },
+      select: { name: true, authId: true }
+    })
+
+    if (!user) {
+      throw new BadRequestException('Email not found')
+    }
+    const token = uuidv4().replace(/-/g, '')
+
+    await this.prismaService.auth.update({
+      where: { id: user.authId },
+      data: { verificationEmailtoken: token }
+    })
+
+    return this.emailService.sendConfirmEmail('Frankz', email, token)
+  }
+
+  async confirmEmail(token: string) {
+    const auth = await this.prismaService.auth.findFirst({
+      where: { verificationEmailtoken: token },
+      select: {
+        id: true,
+        user: {
+          select: { id: true, email: true }
+        }
+      }
+    })
+
+    if (!auth) {
+      throw new BadRequestException('Invalid token')
+    }
+
+    await this.prismaService.user.update({
+      where: { id: auth.user.id, email: auth.user.email },
+      data: { emailVerified: true }
+    })
+
+    return { verified: true }
+  }
+
+  async recoveryPassword(email: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { email: email },
+      select: { name: true, emailVerified: true, authId: true}
+    })
+
+    if (!user) {
+      throw new BadRequestException('Email not found')
+    }
+
+    if (!user.emailVerified) {
+      throw new BadRequestException('Email not verified')
+    }
+
+    const token = uuidv4().replace(/-/g, '')
+
+    await this.prismaService.auth.update({
+      where: { id: user.authId },
+      data: { resetPasswordToken: token }
+    })
+
+    return this.emailService.sendRecoveryPassword(user.name, email, token)
+  }
+
+  async resetPassword(token: string, password: string) {
+    const auth = await this.prismaService.auth.findFirst({
+      where: { resetPasswordToken: token },
+      select: { id: true }
+    })
+
+    if (!auth) {
+      throw new BadRequestException('Invalid token')
+    }
+
+    const saltOrRounds = 10;
+    const hash = await bcrypt.hash(password, saltOrRounds)
+
+    await this.prismaService.auth.update({
+      where: { id: auth.id },
+      data: { password: hash }
+    })
+
+    return { reseted: true }
   }
 }

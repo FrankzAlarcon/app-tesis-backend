@@ -52,4 +52,33 @@ export class AuthController {
   async isLogged() {
     return { isLoggedIn: true }
   }
+
+  @Post('/recovery-password')
+  async recoveryPassword(
+    @Body('email') email: string
+  ) {
+    return this.authService.recoveryPassword(email)
+  }
+
+  @Post('/reset-password')
+  async resetPassword(
+    @Body('token') token: string,
+    @Body('password') password: string
+  ) {
+    return this.authService.resetPassword(token, password)
+  }      
+
+  @Post('/resend-confirmation-email')
+  async resendConfirmationEmail(
+    @Body('email') email: string
+  ) {
+    return this.authService.resendConfirmEmail(email)
+  }
+
+  @Post('/confirm-email')
+  async confirmEmail(
+    @Body('token') token: string
+  ) {
+    return this.authService.confirmEmail(token)
+  }
 }
