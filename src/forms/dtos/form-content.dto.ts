@@ -1,53 +1,63 @@
 import { IsValidJSON } from "@/global/decorators/is-valid-json.decorator";
-import { IsNotEmpty, IsNotEmptyObject } from "class-validator";
+import { IsNotEmpty, IsNotEmptyObject, IsString } from "class-validator";
 
 export class FormContentDto {
+    @IsString()
+    @IsNotEmpty()
+    career: string;
+
+    @IsString()
+    @IsNotEmpty()
+    modality: string;
+
     @IsNotEmpty()
     @IsNotEmptyObject()
     @IsValidJSON(
-      ['businessName', 'city', 'address', 'phone', 'smartPhone', 'businessType', 'businessResponsible'],
-      { message: 'The form content must contain the required properties: businessName, city, address, phone, smartPhone, businessType, businessResponsible' }
+      ['razonSocial', 'ciudad', 'direccion', 'telefono', 'celular', 'tipoInstitucion', 'responsable'],
+      { message: 'The form content must contain the required properties: razonSocial, ciudad, direccion, telefono, celular, tipoInstitucion, responsable' }
     )
     businessData: Record<string, any>;
 
     @IsNotEmpty()
     @IsNotEmptyObject()
     @IsValidJSON(
-      ['dni', 'name', 'aprovedCredits', 'consentment'],
-      { message: 'The form content must contain the required properties: dni, name, aprovedCredits, consentment' }
+      ['cedula', 'nombres', 'creditos'],
+      { message: 'The form content must contain the required properties: cedula, nombres, creditos' }
     )
     studentData: Record<string, any>;
 
     @IsNotEmpty()
     @IsNotEmptyObject()
     @IsValidJSON(
-      ['internshipType', 'wideArea', 'specificArea', 'tutorEPN', 'relationWithCovenant', 'relationWithInvestigationProject', 'relationWithVinculationProject'],
-      { message: 'The form content must contain the required properties: internshipType, wideArea, specificArea, tutorEPN, relationWithCovenant, relationWithInvestigationProject, relationWithVinculationProject' }
+      ['tipoPractica', 'campoAmplio', 'campoEspecifico', 'tutorEpn', 'relacionConConvenio', 'relacionConInvestigacion', 'relacionConVinculacion'],
+      { message: 'The form content must contain the required properties: tipoPractica, campoAmplio, campoEspecifico, tutorEPN, relacionConConvenio, relacionConInvestigacion, relacionConVinculacion' }
     )
     internshipData: Record<string, any>;
 
     @IsNotEmpty()
     @IsNotEmptyObject()
     @IsValidJSON(
-      ['career', 'subjects', 'additionalSubjects'],
-      { message: 'The form content must contain the required properties: career, subjects, additionalSubjects' }
+      ['subjects', 'additionalSubjects'],
+      { message: 'The form content must contain the required properties: subjects, additionalSubjects' }
     )
     subjectsData: Record<string, any>;
 
     @IsNotEmpty()
     @IsNotEmptyObject()
     @IsValidJSON(
-      ['startDate', 'endDate', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 
-        'lunchTime', 'weeklyHours', 'totalHours', 'notWorkingDays', 'observations', 'totalHours'],
-      { message: 'The form content must contain the required properties: startDate, endDate, monday, tuesday, wednesday, thursday, friday, saturday, sunday, lunchTime, weeklyHours, totalHours, notWorkingDays, observations, totalHours' }
+      [
+        'areaAsignada','horarioSemanal', 'incluirDiasNoTrabajados', 'incluirHorasAlmuerzo',
+        'pasantiasPagadas', 'fechasDiasNoTrabajados', 'observacionesAdicionales', 'horasTotales',
+      ],
+      { message: 'The form content must contain the required properties: areaAsignada, horarioSemanal, pasantiasPagadas, fechasNoTrabajadas, observacionesAdicionales, horasTotales' }
     )
     scheduleData: Record<string, any>;
 
     @IsNotEmpty()
     @IsNotEmptyObject()
     @IsValidJSON(
-      ['area', 'wasPaid', 'paymentAmount', 'mainActivities', 'acquiredSkills', 'tutorMonitoring', 'observations', 'qualitativeEvaluation'],
-      { message: 'The form content must contain the required properties: area, wasPaid, paymentAmount, mainActivities, acquiredSkills, tutorMonitoring, observations, qualitativeEvaluation' }
+      ['actividadesDesarrolladas', 'habilidadesAdquiridas', 'seguimientoTutorAcademico', 'observacionesGenerales', 'evaluacionCualitativa'],
+      { message: 'The form content must contain the required properties: actividadesDesarrolladas, habilidadesAdquiridas, seguimientoTutorAcademico, observacionesGenerales, evaluacionCualitativa' }
     )
     activitiesData: Record<string, any>;
 
@@ -55,8 +65,8 @@ export class FormContentDto {
     @IsNotEmpty()
     @IsNotEmptyObject()
     @IsValidJSON(
-      ['businessSignature', 'tutorSignature', 'commissionSignature', 'deanSignature'],
-      { message: 'The form content must contain the required properties: businessSignature, tutorSignature, commissionSignature, deanSignature' }
+      ['tutor', 'entidadReceptora', 'comisionPracticas', 'decano'],
+      { message: 'The form content must contain the required properties: tutor, entidadReceptora, comisionPracticas, decano' }
     )
     signatureData: Record<string, any>;
 }

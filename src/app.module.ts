@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { FormsModule } from './forms/forms.module';
 import { PublicationsModule } from './publications/publications.module';
 import { PostulationsModule } from './postulations/postulations.module';
+import { PrinterModule } from './printer/printer.module';
 import config from './config';
 
 @Module({
@@ -23,6 +24,7 @@ import config from './config';
     }),
     PublicationsModule,
     PostulationsModule,
+    PrinterModule,
   ],
   controllers: [AppController],
   providers: [AppService],

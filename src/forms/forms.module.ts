@@ -8,9 +8,11 @@ import { SubjectsService } from './services/subjects.service';
 import { CareersService } from './services/careers.service';
 import { CareersController } from './controllers/careers.controller';
 import { SubjectsController } from './controllers/subjects.controller';
+import { PrinterModule } from '@/printer/printer.module';
 
 @Module({
   providers: [FormsService, StudentFormService, FormContentService, SubjectsService, CareersService],
-  controllers: [FormsController, StudentFormController, CareersController, SubjectsController]
+  controllers: [FormsController, StudentFormController, CareersController, SubjectsController],
+  imports: [PrinterModule]
 })
 export class FormsModule {}

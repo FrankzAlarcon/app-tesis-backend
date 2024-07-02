@@ -32,9 +32,6 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verify(token,
         { secret: this.configService.jwt.secret }
       ) as JwtPayload
-      // console.log({ payload })
-
-      //TODO: Manage the roles
 
       const isAuthorized = await this.checkRole(payload.role, roles)
 

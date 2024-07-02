@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <table border="1" style="border-collapse: collapse; width: 100%;"
+  data-pdfmake="{&quot;widths&quot;:[&quot;auto&quot;,&quot;*&quot;]}"
+  >
+    <tr>
+        <td colspan="2" style="background-color: #d9e1f2; font-weight: bold; padding: 5px;">4. INFORMACIÓN SOBRE LAS PRÁCTICAS PREPROFESIONALES</td>
+    </tr>
+    <tr>
+        <td style="font-weight: bold; padding: 5px;">Tipo de Práctica Preprofesional:</td>
+        <td style="padding: 5px;">{{ tipoPractica }}</td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; padding: 5px;">Campo Amplio:</td>
+      <td style="padding: 5px;">{{ campoAmplio }}</td>
+    </tr>
+    <tr>
+        <td style="font-weight: bold; padding: 5px;">Campo Específico:</td>
+        <td style="padding: 5px;">{{ campoEspecifico }}</td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; padding: 5px;">Tutor Académico de la Práctica (EPN):</td>
+      <td style="padding: 5px;">{{ tutorEpn }}</td>
+    </tr>
+  </table>
+  <table border="1" style="border-collapse: collapse; width: 100%; margin-top: 10px;"
+    data-pdfmake="{&quot;widths&quot;:[&quot;auto&quot;,40,40,&quot;*&quot;,&quot;*&quot;]}"
+  >
+    <tr>
+        <td colspan="1" style="background-color: #d9e1f2; font-weight: bold; padding: 5px;">RELACIÓN CON</td>
+        <td colspan="1" style="background-color: #d9e1f2; text-align: center; padding: 5px;">SI</td>
+        <td colspan="1" style="background-color: #d9e1f2; text-align: center; padding: 5px;">NO</td>
+        <td colspan="2" style="background-color: #d9e1f2; padding: 5px;">DETALLE</td>
+    </tr>
+    <tr>
+        <td colspan="1" style="font-weight: bold; padding: 5px;">Convenio</td>
+        <td colspan="1" style="text-align: center; padding: 5px;">{{ convenioSi }}</td>
+        <td colspan="1" style="text-align: center; padding: 5px;">{{ convenioNo }}</td>
+        <td colspan="2"  style="text-align: left; padding: 5px;">
+          <strong>Código: </strong>{{ convenioCodigo }}<br>
+          <strong>Título: </strong>{{ convenioTitulo }}
+        </td>
+    </tr>
+    <tr>
+      <td colspan="1" style="font-weight: bold; padding: 5px;">Proyecto de Investigación</td>
+      <td colspan="1" style="text-align: center; padding: 5px;">{{ investigacionSi }}</td>
+      <td colspan="1" style="text-align: center; padding: 5px;">{{ investigacionNo }}</td>
+      <td colspan="2"  style="text-align: left; padding: 5px;">
+        <strong>Código: </strong>{{ investigacionCodigo }}<br>
+        <strong>Título: </strong>{{ investigacionTitulo }}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" style="font-weight: bold; padding: 5px;">Proyecto de Vinculación</td>
+      <td colspan="1" style="text-align: center; padding: 5px;">{{ vinculacionSi }}</td>
+      <td colspan="1" style="text-align: center; padding: 5px;">{{ vinculacionNo }}</td>
+      <td colspan="2"  style="text-align: left; padding: 5px;">
+        <strong>Código: </strong>{{ vinculacionCodigo }}<br>
+        <strong>Título: </strong>{{ vinculacionTitulo }}
+      </td>
+    </tr>
+    <tr>
+        <td colspan="5" style="background-color: #d9e1f2; font-weight: bold; padding: 5px;">Asignaturas de la carrera y temáticas de mayor utilidad para el desarrollo de la práctica preprofesional:</td>
+    </tr>
+    <tr>
+        <td colspan="5" style="padding: 5px;">{{ subjects }}</td>
+    </tr>
+    <tr>
+        <td colspan="5" style="background-color: #d9e1f2; font-weight: bold; padding: 5px;">Temáticas adicionales que no están en la carrera y fueron de utilidad para el desarrollo de la práctica preprofesional:</td>
+    </tr>
+    <tr>
+        <td colspan="5" style="padding: 5px;">{{ additionalSubjects }}</td>
+    </tr>
+  </table>
+</body>
+</html>
