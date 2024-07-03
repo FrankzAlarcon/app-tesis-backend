@@ -193,7 +193,7 @@ export class AuthService {
       where: { email: email },
       select: { name: true, authId: true }
     })
-
+    console.log('resendConfirmEmail', user)
     if (!user) {
       throw new BadRequestException('Email not found')
     }
