@@ -203,8 +203,10 @@ export class AuthService {
       where: { id: user.authId },
       data: { verificationEmailtoken: token }
     })
-
-    return this.emailService.sendConfirmEmail('Frankz', email, token)
+    console.log('resendConfirmEmail', email)
+    const x = this.emailService.sendConfirmEmail('Frankz', email, token)
+    console.log(x)
+    return x
   }
 
   async confirmEmail(token: string) {
