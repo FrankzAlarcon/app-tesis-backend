@@ -193,7 +193,6 @@ export class AuthService {
       where: { email: email },
       select: { name: true, authId: true }
     })
-    console.log('resendConfirmEmail', user)
     if (!user) {
       throw new BadRequestException('Email not found')
     }
@@ -203,10 +202,7 @@ export class AuthService {
       where: { id: user.authId },
       data: { verificationEmailtoken: token }
     })
-    console.log('resendConfirmEmail', email)
-    const x = await this.emailService.sendConfirmEmail(user.name, email, token)
-    console.log(x)
-    return x
+    return await this.emailService.sendConfirmEmail(user.name, email, token)
   }
 
   async confirmEmail(token: string) {

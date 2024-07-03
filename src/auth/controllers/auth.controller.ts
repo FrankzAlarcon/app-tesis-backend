@@ -72,7 +72,6 @@ export class AuthController {
   async resendConfirmationEmail(
     @Body('email') email: string
   ) {
-    console.log('[endpoint]: /resend-confirmation-email')
     return this.authService.resendConfirmEmail(email)
   }
 
