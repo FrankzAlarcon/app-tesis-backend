@@ -12,7 +12,7 @@ export class EmailService {
 
   async sendConfirmEmail(username: string, email: string, token: string) {
     const name = username
-    const verificationLink = this.configService.frontend.url + '/auth/confirm-email?token=' + token
+    const verificationLink = this.configService.frontend.url + '/confirm-email?token=' + token
     return this.mailerService.sendMail({
       from: 'Pasantias EPN <pasantiasepn@epn.edu.ec>',
       to: email,
@@ -55,7 +55,7 @@ export class EmailService {
 
   async sendRecoveryPassword(username: string, email: string, token: string) {
     const name = username
-    const resetLink = this.configService.frontend.url + '/auth/recovery-password?token=' + token
+    const resetLink = this.configService.frontend.url + '/recovery-password?token=' + token
     return this.mailerService.sendMail({
       from: 'Pasantias EPN <pasantiasepn@epn.edu.ec>',
       to: email,
