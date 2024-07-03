@@ -106,7 +106,6 @@ export class AuthService {
   }
 
   async registerStudent(data: CreateStudentDto) {
-    // TODO: add email validation, and those things
     return this.prismaService.$transaction(async (tx) => {
       const token = uuidv4().replace(/-/g, '')
       const auth = await this.create({
@@ -143,7 +142,6 @@ export class AuthService {
   }
 
   async registerBusiness(data: CreateBusinessDto) {
-    // TODO: add email validation, and those things
     const user = await this.prismaService.user.findFirst({
       where: { email: data.email }
     })
@@ -183,6 +181,8 @@ export class AuthService {
           hasCovenant: false
         }
       })
+
+      await this.emailService.sendConfirmEmail(data.name, data.email, token)
 
       return business
     })
