@@ -222,10 +222,16 @@ export class AuthService {
       throw new BadRequestException('Invalid token')
     }
 
-    await this.prismaService.user.update({
-      where: { id: auth.user.id, email: auth.user.email },
-      data: { emailVerified: true }
-    })
+    await Promise.all([
+      this.prismaService.user.update({
+        where: { id: auth.user.id, email: auth.user.email },
+        data: { emailVerified: true }
+      }),
+      this.prismaService.auth.update({
+        where: { id: auth.id },
+        data: { verificationEmailtoken: null }
+      })
+    ])
 
     return { verified: true }
   }
@@ -269,7 +275,7 @@ export class AuthService {
 
     await this.prismaService.auth.update({
       where: { id: auth.id },
-      data: { password: hash }
+      data: { password: hash, resetPasswordToken: null}
     })
 
     return { reseted: true }
