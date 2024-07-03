@@ -48,6 +48,10 @@ export class PublicationsService {
         const signedUrl = await this.s3Service.getSignedUrlObject(p.business.imageUrl, {}, this.configService.aws.imageProfileBucket)
         p.business.imageUrl = signedUrl
       }
+      if (p.imageUrl) {
+        const signedUrl = await this.s3Service.getSignedUrlObject(p.imageUrl, {}, this.configService.aws.publicationImageBucket)
+        p.imageUrl = signedUrl
+      }
       return {
         ...p,
         bookmarked: !!bookmark
