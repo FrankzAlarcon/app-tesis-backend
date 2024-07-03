@@ -204,7 +204,7 @@ export class AuthService {
       data: { verificationEmailtoken: token }
     })
     console.log('resendConfirmEmail', email)
-    const x = this.emailService.sendConfirmEmail('Frankz', email, token)
+    const x = await this.emailService.sendConfirmEmail(user.name, email, token)
     console.log(x)
     return x
   }
