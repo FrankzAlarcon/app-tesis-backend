@@ -41,7 +41,7 @@ export const getSignaturesSection = (data: SignatureSection): Content => {
                 [{ text: 'ENTIDAD RECEPTORA', bold: true, colSpan: 2, alignment: 'center', fontSize: 10 }, {}],
                 [{ text: 'Fecha de revisión: ', fontSize: 10 }, { text: '', fontSize: 10 }],
                 [{ text: 'f.__________________________', fontSize: 10, colSpan: 2, alignment: 'center', marginTop: 30 }, {}],
-                [{ text: 'Tutor', fontSize: 10, colSpan: 2, alignment: 'center' }, {}],
+                [{ text: 'Responsable de la Entidad Receptora', fontSize: 10, colSpan: 2, alignment: 'center' }, {}],
                 [{ text: 'Nombre: ', fontSize: 10 }, { text: data.nombreResponsableEntidad, fontSize: 10 }],
                 [{ text: 'CI: ', fontSize: 10 }, { text: data.ciResponsableEntidad, fontSize: 10 }],
               ]
