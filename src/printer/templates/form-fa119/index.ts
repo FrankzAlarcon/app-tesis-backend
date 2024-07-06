@@ -155,14 +155,14 @@ export const getFormFa119Template = (data: FormContentDto): TDocumentDefinitions
         conocimientosDeficiente: activitiesData.evaluacionCualitativa.conocimientos === 'deficiente' ? 'X' : '',
       }),
       getSignaturesSection({
-        ciTutor: signatureData.ciTutor,
-        nombreTutor: signatureData.nombreTutor,
-        ciResponsableEntidad: signatureData.ciResponsableEntidad,
-        nombreResponsableEntidad: signatureData.nombreResponsableEntidad,
-        ciDecano: signatureData.ciDecano,
-        nombreDecano: signatureData.nombreDecano,
-        ciPresidenteComision: signatureData.ciPresidenteComision,
-        nombrePresidenteComision: signatureData.nombrePresidenteComision
+        ciTutor: signatureData.tutor.ci,
+        nombreTutor: signatureData.tutor.nombre,
+        ciResponsableEntidad: signatureData.entidadReceptora.ci,
+        nombreResponsableEntidad: signatureData.entidadReceptora.nombre,
+        ciDecano: signatureData.decano.ci,
+        nombreDecano: signatureData.decano.name,
+        ciPresidenteComision: signatureData.comisionPracticas.ci,
+        nombrePresidenteComision: signatureData.comisionPracticas.nombre,
       })
     ]
   }
