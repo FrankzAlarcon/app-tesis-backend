@@ -156,13 +156,13 @@ export const getFormFa119Template = (data: FormContentDto): TDocumentDefinitions
       }),
       getSignaturesSection({
         ciTutor: signatureData.tutor.ci,
-        nombreTutor: signatureData.tutor.nombre,
+        nombreTutor: signatureData.tutor.name,
         ciResponsableEntidad: signatureData.entidadReceptora.ci,
-        nombreResponsableEntidad: signatureData.entidadReceptora.nombre,
+        nombreResponsableEntidad: signatureData.entidadReceptora.name,
         ciDecano: signatureData.decano.ci,
         nombreDecano: signatureData.decano.name,
         ciPresidenteComision: signatureData.comisionPracticas.ci,
-        nombrePresidenteComision: signatureData.comisionPracticas.nombre,
+        nombrePresidenteComision: signatureData.comisionPracticas.name,
       })
     ]
   }
