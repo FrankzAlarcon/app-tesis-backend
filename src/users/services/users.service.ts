@@ -15,7 +15,8 @@ export class UsersService {
     const results = await this.prismaService.user.findMany({
       where: {
         name: {
-          contains: text
+          contains: text,
+          mode: 'insensitive'
         }
       },
       select: {
@@ -33,10 +34,21 @@ export class UsersService {
             shortPresentation: true,
           }
         }
-      }
+      },
+      take: 20
     });
-    const students = results.filter(user => user.student !== null);
-    const business = results.filter(user => user.business !== null);
+    const students = results.filter(user => user.student !== null).map(user => ({
+      id: user.id,
+      name: user.name,
+      studentId: user.student.id,
+      shortPresentation: user.student.shortPresentation,
+    }));
+    const business = results.filter(user => user.business !== null).map(user => ({
+      id: user.id,
+      name: user.name,
+      businessId: user.business.id,
+      shortPresentation: user.business.shortPresentation,
+    }));
 
     return {
       students,
