@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { FormsService } from '../services/forms.service';
 import { CreateFormDto } from '../dtos/forms.dto';
@@ -15,6 +15,12 @@ export class FormsController {
   constructor(
     private readonly formsService: FormsService
   ) {}
+
+  @Get()
+  @Roles(Role.ADMIN, Role.STUDENT)
+  async getAll() {
+    return await this.formsService.getAll()
+  }
 
   @Post()
   @Roles(Role.ADMIN)

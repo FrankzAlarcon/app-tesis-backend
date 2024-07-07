@@ -39,6 +39,12 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException('Unathorized')
       }
 
+      // const isCorrectUser = await this.checkUser(payload)
+
+      // if (!isCorrectUser) {
+      //   throw new UnauthorizedException('Unathorized')
+      // }
+
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       request['user'] = payload;
@@ -64,5 +70,42 @@ export class AuthGuard implements CanActivate {
     }
     console.log({ authorizedRoles, userRole })
     return authorizedRoles.includes(userRole.name)
+  }
+
+  private async checkUser(payload: JwtPayload) {
+    if (payload.studentId) {
+      const user = await this.prismaService.student.findUnique({
+        where: { id: payload.studentId },
+        select: {
+          id: true,
+          userId: true
+        }
+      })
+      if (user.userId !== payload.sub) {
+        return false
+      }
+    } else if (payload.businessId) {
+      const user = await this.prismaService.business.findUnique({
+        where: { id: payload.businessId },
+        select: {
+          id: true,
+          userId: true
+        }
+      })
+      if (user.userId !== payload.sub) {
+        return false
+      }
+    } else {
+      const user = await this.prismaService.user.findUnique({
+        where: { id: payload.sub },
+        select: { id: true, email: true}
+      })
+
+      if (!user || user.email !== payload.email) {
+        return false
+      }
+    }
+
+    return true
   }
 }

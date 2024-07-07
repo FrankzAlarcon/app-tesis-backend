@@ -21,6 +21,16 @@ export class StudentFormService {
     return await this.paginationService.paginate(this.prismaService.studenForm, params)
   }
 
+  async getPendingFormsByStudentId(studentId: string) {
+    const studentForms = await this.prismaService.studenForm.findMany({
+      where: {
+        studentId,
+        status: StudentFormStatus.PENDIENTE
+      }
+    })
+    return studentForms
+  }
+
   // the userId should be in the jwt
   async getStudentFormInfo(
     data: GetStudentInfoByFormDto,

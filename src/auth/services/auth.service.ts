@@ -41,7 +41,6 @@ export class AuthService {
     if (!isCorrectPassword) {
       throw new UnauthorizedException('Invalid Credentials')
     }
-    console.log(user)
     const payload: any = {
       sub: user.id,
       name: user.name,

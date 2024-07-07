@@ -26,6 +26,10 @@ export class FormsService {
     private readonly printerService: PrinterService
   ) {}
 
+  async getAll() {
+    return await this.prismaService.form.findMany()
+  }
+
   async create(data: CreateFormDto) {
     return this.prismaService.form.create({
       data

@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/global/guards/auth.guard';
@@ -12,6 +12,15 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService
   ) {}
+
+  @Get('/search/:text')
+  @Roles(Role.ADMIN, Role.BUSINESS, Role.STUDENT)
+  @ApiOperation({ summary: 'Search users by name' })
+  async search(
+    @Param('text') text: string
+  ) {
+    return this.usersService.search(text);
+  }
 
   @Get()
   @Roles(Role.ADMIN)

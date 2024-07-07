@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Put,
   Query,
@@ -72,6 +73,14 @@ export class StudentsController {
   ) {
     const user = req.user as JwtPayload
     return this.profileService.getShortProfile(user.studentId)
+  }
+
+  @Get('/public/profile/:studentId')
+  @Roles(Role.STUDENT, Role.ADMIN, Role.BUSINESS)
+  async getPublicProfile(
+    @Param('studentId') studentId: string
+  ) {
+    return this.profileService.getPublicProfile(studentId)
   }
 
   @Get('/forums')

@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CertificationsService } from './certifications.service';
 import { S3Service } from '@/database/services/s3.service';
+import { StudentFormService } from '@/forms/services/student-form.service';
 
 @Injectable()
 export class ProfileService {
@@ -10,6 +11,7 @@ export class ProfileService {
     private readonly prismaService: PrismaService,
     private readonly projectsService: ProjectsService,
     private readonly certificationsService: CertificationsService,
+    private readonly studentsFormService: StudentFormService,
     private readonly s3Service: S3Service
   ){ }
 
@@ -35,9 +37,10 @@ export class ProfileService {
         }
       }),
       this.projectsService.getByStudent(studentId),
-      this.certificationsService.getByStudent(studentId)
+      this.certificationsService.getByStudent(studentId),
+      this.studentsFormService.getPendingFormsByStudentId(studentId)
     ])
-    const [student, projects, certifications] = promises;
+    const [student, projects, certifications, studentForms] = promises;
     const {user, ...rest} = student
     if (student.imageUrl) {
       rest.imageUrl = await this.s3Service.getSignedUrlObject(student.imageUrl)
@@ -46,7 +49,8 @@ export class ProfileService {
       ...user,
       ...rest,
       projects,
-      certifications
+      certifications,
+      studentForms
     }
   }
 
@@ -83,6 +87,42 @@ export class ProfileService {
       ...user,
       postulationsCount,
       recommendedCount
+    }
+  }
+
+  async getPublicProfile(studentId: string) {
+    // get student info, projects, curriculum, certifications, etc
+    const promises = await Promise.all([
+      this.prismaService.student.findUnique({
+        where: { id: studentId},
+        select: {
+          id: true,
+          shortPresentation: true,
+          description: true,
+          faculty: true,
+          ira: true,
+          imageUrl: true,
+          user: {
+            select: {
+              email: true,
+              name: true,
+            }
+          }
+        }
+      }),
+      this.projectsService.getByStudent(studentId),
+      this.certificationsService.getByStudent(studentId)
+    ])
+    const [student, projects, certifications] = promises;
+    const {user, ...rest} = student
+    if (student.imageUrl) {
+      rest.imageUrl = await this.s3Service.getSignedUrlObject(student.imageUrl)
+    }
+    return {
+      ...user,
+      ...rest,
+      projects,
+      certifications
     }
   }
 }

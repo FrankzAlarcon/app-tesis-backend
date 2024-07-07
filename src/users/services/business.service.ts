@@ -104,6 +104,10 @@ export class BusinessService {
     return business
   }
 
+  async getPublicProfile(businessId: string) {
+    return this.getProfile(businessId)
+  }
+
   async getPublications(businessId: string, params: PaginationQueryDto) {
     return this.publicationService.getAllByBusiness(businessId, params)
   }

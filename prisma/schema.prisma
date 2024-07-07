@@ -207,7 +207,7 @@ model StudenForm {
   startDate DateTime @map("start_date")
   approvalDate DateTime? @map("approval_date")
   status   String
-  url       String
+  url       String @unique
 
   student   Student @relation(fields: [studentId], references: [id])
   studentId String  @map("student_id")

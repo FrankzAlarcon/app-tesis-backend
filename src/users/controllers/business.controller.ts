@@ -75,6 +75,14 @@ export class BusinessController {
     return this.businessService.getShortProfile(user.businessId);
   }
 
+  @Get('/public/profile/:businessId')
+  @Roles(Role.STUDENT, Role.BUSINESS, Role.ADMIN)
+  async getPublicProfile(
+    @Param('businessId') businessId: string
+  ) {
+    return this.businessService.getPublicProfile(businessId);
+  }
+
   @Get('/public/short-profile/:businessId')
   @Roles(Role.STUDENT, Role.BUSINESS, Role.ADMIN)
   async getPublicShortProfile(
@@ -94,6 +102,15 @@ export class BusinessController {
       throw new BadRequestException('Business not found');
     }
     return this.businessService.getPublications(user.businessId, params);
+  }
+
+  @Get('/public/publications/:businessId')
+  @Roles(Role.STUDENT, Role.ADMIN, Role.BUSINESS)
+  async getPublicPublications(
+    @Param('businessId') businessId: string,
+    @Query() params: PaginationQueryDto
+  ) {
+    return this.businessService.getPublications(businessId, params);
   }
 
   @Get('/publications/:publicationId')

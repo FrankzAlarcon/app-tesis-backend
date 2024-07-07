@@ -13,6 +13,7 @@ import { PrinterModule } from '@/printer/printer.module';
 @Module({
   providers: [FormsService, StudentFormService, FormContentService, SubjectsService, CareersService],
   controllers: [FormsController, StudentFormController, CareersController, SubjectsController],
-  imports: [PrinterModule]
+  imports: [PrinterModule],
+  exports: [StudentFormService]
 })
 export class FormsModule {}
