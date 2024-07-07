@@ -25,7 +25,6 @@ export class StudentFormService {
     const studentForms = await this.prismaService.studenForm.findMany({
       where: {
         studentId,
-        status: StudentFormStatus.PENDIENTE
       }
     })
     return studentForms
