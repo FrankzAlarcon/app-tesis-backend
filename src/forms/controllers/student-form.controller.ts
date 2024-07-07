@@ -1,7 +1,7 @@
 import {
   Body, Controller, Get, HttpCode, 
   HttpStatus, 
-  Post, Query, Res, StreamableFile, UploadedFile,
+  Post, Query, Req, Res, StreamableFile, UploadedFile,
   UseGuards, UseInterceptors
 } from '@nestjs/common';
 import { DownloadStudentFormDto, UploadStudentFormDto } from '../dtos/student-form.dto';
@@ -14,6 +14,7 @@ import { AuthGuard } from '@/global/guards/auth.guard';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
 import { Response } from 'express';
+import { JwtPayload } from '@/global/interfaces/jwt.interface';
 
 @ApiTags('Student Forms')
 @UseGuards(AuthGuard)
@@ -45,11 +46,15 @@ export class StudentFormController {
   @Roles(Role.ADMIN, Role.STUDENT)
   @UseInterceptors(FileInterceptor('file'))
   async uploadPendingForm(
+    @Req() req: any,
     @Body() data: UploadStudentFormDto,
     @UploadedFile() file: Express.Multer.File
   ) {
-    console.log(file)
-    return this.studenFormService.uploadPendingStudentForm(file, data)
+    const user = req.user as JwtPayload
+    return this.studenFormService.uploadPendingStudentForm(file, {
+      ...data,
+      studentId: user.studentId
+    })
   }
 
   @Post('upload-approved')
