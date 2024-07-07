@@ -77,6 +77,7 @@ export class StudentFormService {
     if (!form) {
       throw new NotFoundException('Form not found')
     }
+    const formContent = JSON.parse(data.data)
     const url = uuidv4() + `.${file.originalname.split('.').pop()}`
     const studentForm = this.prismaService.$transaction(async (tx) => {
       const studentForm = await tx.studenForm.create({
@@ -84,11 +85,25 @@ export class StudentFormService {
           startDate: new Date(),
           formId: data.formId,
           studentId: data.studentId,
-          status: StudentFormStatus.PENDIENTE,
+          status: StudentFormStatus.EMITIDO,
           url,
         }
       })
       await this.s3Service.uploadPendingObject(url, file.buffer)
+      await tx.formContent.create({
+        data: {
+          career: formContent.career || null,
+          modality: formContent.modality || null,
+          businessData: formContent.businessData || null,
+          studentData: formContent.studentData || null,
+          internshipData: formContent.internshipData || null,
+          subjectsData: formContent.subjectsData || null,
+          scheduleData: formContent.scheduleData || null,
+          activitiesData: formContent.activitiesData || null,
+          signatureData: formContent.signatureData || null,
+          studentFormId: studentForm.id
+        }
+      })
       return studentForm;
     })
 

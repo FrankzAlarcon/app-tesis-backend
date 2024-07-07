@@ -396,13 +396,15 @@ model Postulation {
 
 model FormContent {
   id        String @id @default(uuid())
-  businessData Json 
-  studentData Json
-  internshipData Json
-  subjectsData Json
-  scheduleData Json
-  activitiesData Json
-  signatureData Json
+  career    String? 
+  modality String? 
+  businessData Json? @map("business_data")
+  studentData Json? @map("student_data")
+  internshipData Json? @map("internship_data")
+  subjectsData Json? @map("subjects_data")
+  scheduleData Json? @map("schedule_data")
+  activitiesData Json? @map("activities_data")
+  signatureData Json? @map("signature_data")
 
   studentForm      StudenForm @relation(fields: [studentFormId], references: [id])
   studentFormId    String @map("student_form_id")
