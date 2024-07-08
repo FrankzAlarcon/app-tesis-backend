@@ -1,10 +1,11 @@
 import {
   Body, Controller, Get, HttpCode, 
   HttpStatus, 
+  Param, 
   Post, Query, Req, Res, StreamableFile, UploadedFile,
   UseGuards, UseInterceptors
 } from '@nestjs/common';
-import { DownloadStudentFormDto, UploadStudentFormDto } from '../dtos/student-form.dto';
+import { DownloadStudentFormDto, UploadApprovedStudentForm, UploadPendingStudentForm, UploadStudentFormDto } from '../dtos/student-form.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { StudentFormService } from '../services/student-form.service';
 import { GetStudentInfoByFormDto } from '../dtos/forms.dto';
@@ -33,6 +34,23 @@ export class StudentFormController {
     return this.studenFormService.getStudentForms(params)
   }
 
+  @Get('/download/:studentFormId/:status')
+  @Roles(Role.ADMIN, Role.STUDENT)
+  async getPendingForms(
+    @Req() req: any,
+    @Param('studentFormId') studentFormId: string,
+    @Param('status') status: string
+  ) {
+    const user = req.user as JwtPayload
+    console.log(user)
+    const rta = await this.studenFormService.getStudentForm(studentFormId, status)
+    const byteDocument = await rta.file.transformToByteArray()
+    return new StreamableFile(byteDocument, {
+      type: 'application/pdf',
+      disposition: 'attachment; filename=student-form.pdf',
+    })
+  }
+
   @Post('get-by-filename')
   @HttpCode(HttpStatus.OK)
   @Roles(Role.ADMIN)
@@ -42,30 +60,51 @@ export class StudentFormController {
     return this.studenFormService.getStudentFormInfo(data)
   }
 
-  @Post('upload-pending')
+  @Post('upload-emitted')
   @Roles(Role.ADMIN, Role.STUDENT)
   @UseInterceptors(FileInterceptor('file'))
-  async uploadPendingForm(
+  async uploadEmittedForm(
     @Req() req: any,
     @Body() data: UploadStudentFormDto,
     @UploadedFile() file: Express.Multer.File
   ) {
     const user = req.user as JwtPayload
-    return this.studenFormService.uploadPendingStudentForm(file, {
+    return this.studenFormService.uploadEmittedStudentForm(file, {
       ...data,
       studentId: user.studentId
     })
+  }
+
+  @Post('upload-pending')
+  @Roles(Role.ADMIN, Role.STUDENT)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadPendingForm(
+    @Req() req: any,
+    @Body() data: UploadPendingStudentForm,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    const user = req.user as JwtPayload
+    return this.studenFormService.uploadPendingStudentForm(file, data, user.studentId)
   }
 
   @Post('upload-approved')
   @Roles(Role.ADMIN)
   @UseInterceptors(FileInterceptor('file'))
   async uploadApprovedForm(
-    @Body() data: UploadStudentFormDto,
+    @Body() data: UploadApprovedStudentForm,
     @UploadedFile() file: Express.Multer.File
   ) {
-    console.log(file)
     return this.studenFormService.uploadApprovedStudentForm(file, data)
+  }
+
+  @Post('upload-repproved')
+  @Roles(Role.ADMIN)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadRepprovedForm(
+    @Body() data: UploadApprovedStudentForm,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    return this.studenFormService.uploadRepprovedStudentForm(file, data)
   }
 
   @Post('/download-pending')

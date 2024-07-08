@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import config from '@/config';
+import { StudentFormBucket } from '@/global/enums/student-forms.enum';
 
 @Injectable()
 export class S3Service {
@@ -35,6 +36,29 @@ export class S3Service {
     const response = await this.signUrl(command, options)
 
     return response
+  }
+
+  async getFormObject({
+    filename, status, bucket
+  }: {filename: string, status: StudentFormBucket, bucket?: string}) {
+    return this.s3Service.send(
+      new GetObjectCommand({
+        Bucket: bucket ?? this.configService.aws.pendingBucket,
+        Key: status + '/' + filename
+      })
+    )
+  }
+
+  async uploadFormObject({
+    filename, file, status, bucket
+  }: {filename: string, file: Buffer, status: StudentFormBucket, bucket?: string}) {
+    return await this.s3Service.send(
+      new PutObjectCommand({
+        Bucket: bucket ?? this.configService.aws.pendingBucket,
+        Key: status + '/' + filename,
+        Body: file
+      })
+    )
   }
 
   async getApprovedObject(filename: string, bucket?: string) {

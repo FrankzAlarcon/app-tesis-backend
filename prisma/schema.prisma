@@ -205,6 +205,8 @@ model Form {
 model StudenForm {
   id        String @id @default(uuid())
   startDate DateTime @map("start_date")
+  pendingDate DateTime? @map("pending_date")
+  repprovalDate DateTime? @map("repproval_date")
   approvalDate DateTime? @map("approval_date")
   status   String
   url       String @unique

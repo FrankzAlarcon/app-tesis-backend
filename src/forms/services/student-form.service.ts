@@ -2,9 +2,8 @@ import { PrismaService } from '@/database/services/prisma.service';
 import { S3Service } from '@/database/services/s3.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid'
-import { DownloadStudentFormDto, UploadStudentFormDto } from '../dtos/student-form.dto';
-import { StudentForm } from '../entities/student-form.entity';
-import { StudentFormStatus } from '@/global/enums/student-forms.enum';
+import { DownloadStudentFormDto, UploadApprovedStudentForm, UploadPendingStudentForm, UploadStudentFormDto } from '../dtos/student-form.dto';
+import { StudentFormBucket, StudentFormStatus } from '@/global/enums/student-forms.enum';
 import { GetStudentInfoByFormDto } from '../dtos/forms.dto';
 import { PaginationService } from '@/database/services/pagination.service';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
@@ -30,10 +29,8 @@ export class StudentFormService {
     return studentForms
   }
 
-  // the userId should be in the jwt
   async getStudentFormInfo(
     data: GetStudentInfoByFormDto,
-    // userId: string
   ) {
     // TODO: Validate that the requester is an admin
     // TODO: Improve the query using postgresql views
@@ -63,9 +60,35 @@ export class StudentFormService {
     }))
   }
 
-  // TODO: Valid this could be used by students
-  async uploadPendingStudentForm(file: Express.Multer.File, data: UploadStudentFormDto): Promise<StudentForm> {
-    // TODO: add validations for studentId and formId
+  async getStudentForm(studentFormId: string, status: string) {
+    const studentForm = await this.prismaService.studenForm.findFirst({
+      where: {
+        id: studentFormId,
+        status
+      }
+    })
+    if (!studentForm) {
+      throw new NotFoundException('Student form not found')
+    }
+    const isValidStatus = Object.values(StudentFormStatus).includes(status as StudentFormStatus)
+    if (!isValidStatus) {
+      throw new NotFoundException('Invalid status')
+    }
+    try {
+      const object = await this.s3Service.getFormObject({
+        filename: studentForm.url,
+        status: status as StudentFormBucket
+      })
+      return {
+        file: object.Body,
+        filename: studentForm.url
+      }
+    } catch (error) {
+      throw new NotFoundException('File not found')
+    }
+  }
+
+  async uploadEmittedStudentForm(file: Express.Multer.File, data: UploadStudentFormDto) {
     const [student, form] = await Promise.all([
       this.prismaService.student.findFirst({ where: { id: data.studentId }}),
       this.prismaService.form.findFirst({ where: { id: data.formId }})
@@ -88,7 +111,11 @@ export class StudentFormService {
           url,
         }
       })
-      await this.s3Service.uploadPendingObject(url, file.buffer)
+      await this.s3Service.uploadFormObject({
+        filename: url,
+        file: file.buffer,
+        status: StudentFormBucket.EMITTED
+      })
       await tx.formContent.create({
         data: {
           career: formContent.career || null,
@@ -109,35 +136,100 @@ export class StudentFormService {
     return studentForm;
   }
 
-  // TODO: Valid this should be made just by admin
-  async uploadApprovedStudentForm(file: Express.Multer.File, data: UploadStudentFormDto) {
-      // TODO: add validations for studentId and formId
-      const [student, form] = await Promise.all([
-        this.prismaService.student.findFirst({ where: { id: data.studentId }}),
-        this.prismaService.form.findFirst({ where: { id: data.formId }})
-      ])
-      if (!student) {
-        throw new NotFoundException('Student not found')
+  async uploadPendingStudentForm(file: Express.Multer.File, data: UploadPendingStudentForm, studentId: string) {
+    const studentForm = await this.prismaService.studenForm.findFirst({
+      where: {
+        studentId,
+        url: data.url,
+        status: StudentFormStatus.EMITIDO
+      },
+      select: {
+        id: true,
+        url: true
       }
-      if (!form) {
-        throw new NotFoundException('Form not found')
+    })
+    if (!studentForm) {
+      throw new NotFoundException('Student form not found')
+    }
+    await this.s3Service.uploadFormObject({
+      filename: studentForm.url,
+      file: file.buffer,
+      status: StudentFormBucket.PENDING
+    })
+    const updatedStudentForm = await this.prismaService.studenForm.update({
+      where: {
+        id: studentForm.id
+      },
+      data: {
+        status: StudentFormStatus.PENDIENTE,
+        url: data.url
       }
-      const url = uuidv4() + `.${file.originalname.split('.').pop()}`
-      const studentForm = this.prismaService.$transaction(async (tx) => {
-        const studentForm = await tx.studenForm.create({
-          data: {
-            startDate: new Date(),
-            formId: data.formId,
-            studentId: data.studentId,
-            status: StudentFormStatus.PENDIENTE,
-            url,
-          }
-        })
-        await this.s3Service.uploadApprovedObject(url, file.buffer)
-        return studentForm;
-      })
-  
-      return studentForm;
+    })
+    return updatedStudentForm
+  }
+
+  async uploadApprovedStudentForm(file: Express.Multer.File, data: UploadApprovedStudentForm) {
+    const studentForm = await this.prismaService.studenForm.findFirst({
+      where: {
+        studentId: data.studentFormId,
+        url: data.url,
+        status: StudentFormStatus.PENDIENTE
+      },
+      select: {
+        id: true,
+        url: true
+      }
+    })
+    if (!studentForm) {
+      throw new NotFoundException('Student form not found')
+    }
+    await this.s3Service.uploadFormObject({
+      filename: studentForm.url,
+      file: file.buffer,
+      status: StudentFormBucket.APPROVED
+    })
+    const updatedStudentForm = await this.prismaService.studenForm.update({
+      where: {
+        id: studentForm.id
+      },
+      data: {
+        status: StudentFormStatus.APROBADO,
+        url: data.url
+      }
+    })
+    return updatedStudentForm
+  }
+
+  async uploadRepprovedStudentForm(file: Express.Multer.File, data: UploadApprovedStudentForm) {
+    const studentForm = await this.prismaService.studenForm.findFirst({
+      where: {
+        studentId: data.studentFormId,
+        url: data.url,
+        status: StudentFormStatus.PENDIENTE
+      },
+      select: {
+        id: true,
+        url: true
+      }
+    })
+    if (!studentForm) {
+      throw new NotFoundException('Student form not found')
+    }
+    await this.s3Service.uploadFormObject({
+      filename: studentForm.url,
+      file: file.buffer,
+      status: StudentFormBucket.REPPROVED
+    })
+    const updatedStudentForm = await this.prismaService.studenForm.update({
+      where: {
+        id: studentForm.id
+      },
+      data: {
+        status: StudentFormStatus.RECHAZADO,
+        url: data.url
+      }
+    })
+    return updatedStudentForm
   }
 
   async downloadPendingForm(data: DownloadStudentFormDto) {

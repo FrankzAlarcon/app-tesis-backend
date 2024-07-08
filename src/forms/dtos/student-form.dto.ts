@@ -33,6 +33,22 @@ export class UploadStudentFormDto {
   readonly data: string
 }
 
+export class UploadPendingStudentForm {
+  @IsString()
+  @IsNotEmpty()
+  url: string
+}
+
+export class UploadApprovedStudentForm {
+  @IsString()
+  @IsNotEmpty()
+  studentFormId: string
+
+  @IsString()
+  @IsNotEmpty()
+  url: string
+}
+
 export class DownloadStudentFormDto {
   @IsString()
   @IsNotEmpty()
