@@ -21,7 +21,7 @@ export class BusinessService {
   ) {}
 
   async getAll(params: PaginationQueryDto) {
-    return this.paginationService.paginate(this.prismaService.business, params)
+    return this.paginationService.paginate(this.prismaService.business, params, {})
   }
 
   async getAllShortInformation(params: PaginationQueryDto) {

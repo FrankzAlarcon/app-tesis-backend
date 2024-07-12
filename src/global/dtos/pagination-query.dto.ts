@@ -26,4 +26,12 @@ export class PaginationQueryDto {
   @IsString()
   @IsOptional()
   filterValue: string
+
+  @IsString()
+  @IsOptional()
+  orderField: string
+
+  @IsString()
+  @IsOptional()
+  orderDirection: 'asc' | 'desc'
 }

@@ -27,6 +27,16 @@ export class PaginationService {
       })
     }
 
+    if (params.orderField && params.orderDirection) {
+      findParams.orderBy = {
+        [params.orderField]: params.orderDirection
+      }
+    } else {
+      findParams.orderBy = {
+        createdAt: 'desc'
+      }
+    }
+
     const data = await entity.findMany({
       where,
       skip: params.offset,
