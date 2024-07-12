@@ -11,11 +11,15 @@ export class PaginationService {
   ) {
     let total: number = 0;
     if (params.filterField && params.filterValue) {
-      total = await entity.count({
-        where: {
-          ...where,
-          [params.filterField]: params.filterValue
+      where = {
+        ...where,
+        [params.filterField]: {
+          contains: params.filterValue,
+          mode: 'insensitive'
         }
+      }
+      total = await entity.count({
+        where
       })
     } else {
       total = await entity.count({

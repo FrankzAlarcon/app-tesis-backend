@@ -76,6 +76,7 @@ export class StudentFormService {
     }
 
     try {
+      console.log(statusToBucket[status as StudentFormStatus], studentForm.url)
       const object = await this.s3Service.getFormObject({
         filename: studentForm.url,
         status: statusToBucket[status as StudentFormStatus]
