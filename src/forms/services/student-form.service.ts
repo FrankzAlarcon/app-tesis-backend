@@ -23,6 +23,25 @@ export class StudentFormService {
         throw new NotFoundException('Invalid status')
       }
     }
+    this.prismaService.studenForm.findMany({
+      include: {
+        student: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                name: true
+              }
+            },
+          }
+        },
+        form: {
+          select: {
+            code: true,
+          }
+        }
+      }
+    })
     const studentForms = await this.paginationService.paginate(
       this.prismaService.studenForm,
       params,
@@ -39,6 +58,11 @@ export class StudentFormService {
                   name: true
                 }
               }
+            }
+          },
+          form: {
+            select: {
+              code: true,
             }
           }
         }
