@@ -11,3 +11,10 @@ export enum StudentFormBucket {
   APPROVED = 'approved',
   REPPROVED = 'repproved'
 }
+
+export const statusToBucket = {
+  [StudentFormStatus.EMITIDO]: StudentFormBucket.EMITTED,
+  [StudentFormStatus.PENDIENTE]: StudentFormBucket.PENDING,
+  [StudentFormStatus.APROBADO]: StudentFormBucket.APPROVED,
+  [StudentFormStatus.RECHAZADO]: StudentFormBucket.REPPROVED
+}

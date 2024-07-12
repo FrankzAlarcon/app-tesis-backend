@@ -3,7 +3,7 @@ import { S3Service } from '@/database/services/s3.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid'
 import { DownloadStudentFormDto, UploadApprovedStudentForm, UploadPendingStudentForm, UploadStudentFormDto } from '../dtos/student-form.dto';
-import { StudentFormBucket, StudentFormStatus } from '@/global/enums/student-forms.enum';
+import { statusToBucket, StudentFormBucket, StudentFormStatus } from '@/global/enums/student-forms.enum';
 import { GetStudentInfoByFormDto } from '../dtos/forms.dto';
 import { PaginationService } from '@/database/services/pagination.service';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
@@ -74,10 +74,11 @@ export class StudentFormService {
     if (!isValidStatus) {
       throw new NotFoundException('Invalid status')
     }
+
     try {
       const object = await this.s3Service.getFormObject({
         filename: studentForm.url,
-        status: status as StudentFormBucket
+        status: statusToBucket[status as StudentFormStatus]
       })
       return {
         file: object.Body,
