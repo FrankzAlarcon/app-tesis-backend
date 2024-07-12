@@ -26,12 +26,13 @@ export class StudentFormController {
     private readonly studenFormService: StudentFormService
   ) {}
 
-  @Get()
+  @Get('/:status')
   @Roles(Role.ADMIN)
   async getStudentsForms(
+    @Param('status') status: string,
     @Query() params: PaginationQueryDto
   ) {
-    return this.studenFormService.getStudentForms(params)
+    return this.studenFormService.getStudentForms(status, params)
   }
 
   @Get('/download/:studentFormId/:status')

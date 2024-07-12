@@ -16,8 +16,46 @@ export class StudentFormService {
     private readonly paginationService: PaginationService
   ) {}
 
-  async getStudentForms(params: PaginationQueryDto) {
-    return await this.paginationService.paginate(this.prismaService.studenForm, params)
+  async getStudentForms(status: string, params: PaginationQueryDto) {
+    if (status !== 'all') {
+      const isValidStatus = Object.values(StudentFormStatus).includes(status as StudentFormStatus)
+      if (!isValidStatus) {
+        throw new NotFoundException('Invalid status')
+      }
+    }
+    const studentForms = await this.paginationService.paginate(
+      this.prismaService.studenForm,
+      params,
+      {
+        status: status === 'all' ? undefined : status
+      },
+      {
+        include: {
+          student: {
+            select: {
+              id: true,
+              user: {
+                select: {
+                  name: true
+                }
+              }
+            }
+          }
+        }
+      }
+    )
+    const mappedData = studentForms.data.map((studentForm) => ({
+      ...studentForm,
+      student: {
+        id: studentForm.student.id,
+        name: studentForm.student.user.name
+      }
+    }))
+
+    return {
+      ...studentForms,
+      data: mappedData
+    }
   }
 
   async getPendingFormsByStudentId(studentId: string) {
