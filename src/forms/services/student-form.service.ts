@@ -68,13 +68,15 @@ export class StudentFormService {
         }
       }
     )
-    const mappedData = studentForms.data.map((studentForm) => ({
-      ...studentForm,
-      student: {
-        id: studentForm.student.id,
-        name: studentForm.student.user.name
-      }
-    }))
+    const mappedData = studentForms.data.map((studentForm) => {
+      const { student, form, ...rest } = studentForm
+      return ({
+        ...rest,
+        studentId: student.id,
+        studentName: student.user.name,
+        formCode: form.code,
+      })
+    })
 
     return {
       ...studentForms,
