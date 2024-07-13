@@ -23,30 +23,26 @@ export class StudentFormService {
         throw new NotFoundException('Invalid status')
       }
     }
-    this.prismaService.studenForm.findMany({
-      include: {
+    const { filterField, filterValue, ...rest } = params
+    let where = {}
+    if (filterField && filterValue) {
+      where = {
         student: {
-          select: {
-            id: true,
-            user: {
-              select: {
-                name: true
-              }
-            },
-          }
-        },
-        form: {
-          select: {
-            code: true,
+          user: {
+            [filterField]: {
+              contains: filterValue,
+              mode: 'insensitive'
+            }
           }
         }
       }
-    })
+    }
     const studentForms = await this.paginationService.paginate(
       this.prismaService.studenForm,
-      params,
+      rest as PaginationQueryDto,
       {
-        status: status === 'all' ? undefined : status
+        status: status === 'all' ? undefined : status,
+        ...where
       },
       {
         include: {
