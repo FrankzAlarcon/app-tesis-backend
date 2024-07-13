@@ -9,6 +9,8 @@ import { S3Service } from '@/database/services/s3.service';
 import { v4 as uuidv4 } from 'uuid'
 import config from '@/config';
 import { PostulationsService } from '@/postulations/services/postulations.service';
+import { PublicationsRepositoryService } from '@/database/services/repositories/publications-repository.service';
+import { StudentsRepositoryService } from '@/database/services/repositories/students-repository.service';
 
 @Injectable()
 export class PublicationsService {
@@ -17,32 +19,44 @@ export class PublicationsService {
     private readonly paginationService: PaginationService,
     private readonly s3Service: S3Service,
     private readonly postulationsService: PostulationsService,
+    private readonly publicationsRepositoryService: PublicationsRepositoryService,
+    private readonly studentsRepositoryService: StudentsRepositoryService,
     @Inject(config.KEY) private readonly configService: ConfigType<typeof config>,
   ) {}
 
   async getFeed(studentId: string, params: PaginationQueryDto) {
-    const business = await this.paginationService.paginate(
-      this.prismaService.publication,
-      params,
-      {}, 
-      {
-        include:{
-          business: {
-            select: {
-              id: true,
-              name: true,
-              imageUrl: true
-            }
-          },
+    let publications = {
+      total: 0,
+      totalPages: 1,
+      data: []
+    }
+    const pubs = await this.publicationsRepositoryService.getRecommendations(studentId, params)
+    if (pubs.data.length !== 0) {
+      publications = pubs
+    } else {
+      publications = await this.paginationService.paginate(
+        this.prismaService.publication,
+        params,
+        {}, 
+        {
+          include:{
+            business: {
+              select: {
+                id: true,
+                name: true,
+                imageUrl: true
+              }
+            },
+          }
         }
-      }
-    )
+      )
+    }
 
     const studentBookmarks = await this.prismaService.studentBookmarks.findMany({
-      where: { studentId, publicationId: { in: business.data.map(p => p.id)}}
+      where: { studentId, publicationId: { in: publications.data.map(p => p.id)}}
     })
 
-    const publications = await Promise.all(business.data.map(async (p) => {
+    const publicationsComplete = await Promise.all(publications.data.map(async (p) => {
       const bookmark = studentBookmarks.find(b => b.publicationId === p.id)
       if (p.business.imageUrl) {
         const signedUrl = await this.s3Service.getSignedUrlObject(p.business.imageUrl, {}, this.configService.aws.imageProfileBucket)
@@ -59,8 +73,8 @@ export class PublicationsService {
     }))
 
     return {
-      ...business,
-      data: publications
+      ...publications,
+      data: publicationsComplete,
     }
   }
 
@@ -86,15 +100,17 @@ export class PublicationsService {
         }
       }
     )
-    const candidatesCount = 0
-    const mappedData = data.data.map(p => {
-      const { postulations, ...rest } = p
-      return {
-        ...rest,
-        postulationsCount: postulations.length,
-        candidatesCount,
-      }
-    })
+    const mappedData = await Promise.all(
+      data.data.map(async (p) => {
+        const { postulations, ...rest } = p
+        const candidatesCount = await this.studentsRepositoryService.getRecommendationsCount(p.id)
+        return {
+          ...rest,
+          postulationsCount: postulations.length,
+          candidatesCount,
+        }
+      })
+    )
 
     return {
       ...data,
@@ -121,16 +137,20 @@ export class PublicationsService {
       },
       take: 4      
     })
-    // TODO: Recomendaciones
-    const candidatesCount = 0
-    return publications.map(p => {
-      const { postulations, ...rest } = p
-      return {
-        ...rest,
-        postulationsCount: postulations.length,
-        candidatesCount,
-      }
-    })
+
+    const completePublications = await Promise.all(
+      publications.map(async (p) => {
+        const { postulations, ...rest } = p
+        const candidatesCount = await this.studentsRepositoryService.getRecommendationsCount(p.id)
+        return {
+          ...rest,
+          postulationsCount: postulations.length,
+          candidatesCount,
+        }
+      })
+    )
+
+    return completePublications
   }
 
   async getAllBookmarkedByStudent(studentId: string, params: PaginationQueryDto) {
@@ -213,6 +233,19 @@ export class PublicationsService {
     }
   }
 
+  private async getMappedRecommendations(publicationId: string) {
+    const recommendations = await this.studentsRepositoryService.getRecommendations(publicationId)
+    const mappedRecommendations = await Promise.all(
+      recommendations.map(async (recommendation) => {
+        if (recommendation.imageUrl) {
+          recommendation.imageUrl = await this.s3Service.getSignedUrlObject(recommendation.imageUrl)
+        }
+        return recommendation
+      })
+    )
+    return mappedRecommendations
+  }
+
   async getOneByBusiness(businessId: string, publicationId: string) {
     const publication = await this.prismaService.publication.findUnique({
       where: { id: publicationId, businessId }
@@ -228,7 +261,7 @@ export class PublicationsService {
       publication.imageUrl = signedUrl
     }
 
-    const [postulations, publicationSkills] = await Promise.all([
+    const [postulations, publicationSkills, recommendations] = await Promise.all([
       this.postulationsService.getPostulationsByPublication(publicationId),
       this.prismaService.publicationSkill.findMany({
         where: { publicationId: publication.id },
@@ -241,7 +274,8 @@ export class PublicationsService {
             }
           }
         }
-      })
+      }),
+      this.getMappedRecommendations(publicationId)
     ])
     const mappedSkills = publicationSkills.map(ps => ({
       publicationSkillId: ps.id,
@@ -264,6 +298,7 @@ export class PublicationsService {
     return {
       ...publication,
       postulations: mappedPostulations,
+      recommendations,
       skills: mappedSkills
     }
   }
