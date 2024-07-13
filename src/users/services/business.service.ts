@@ -21,7 +21,18 @@ export class BusinessService {
   ) {}
 
   async getAll(params: PaginationQueryDto) {
-    return this.paginationService.paginate(this.prismaService.business, params, {})
+    const business = await this.paginationService.paginate(this.prismaService.business, params, {})
+    const mappedBusiness = await Promise.all(business.data.map(async (b: any) => {
+      if (b.imageUrl) {
+        b.imageUrl = await this.s3Service.getSignedUrlObject(b.imageUrl)
+      }
+      return b
+    }))
+
+    return {
+      ...business,
+      data: mappedBusiness
+    }
   }
 
   async getAllShortInformation(params: PaginationQueryDto) {
