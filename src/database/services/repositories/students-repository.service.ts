@@ -67,9 +67,9 @@ export class StudentsRepositoryService {
         s.created_at,
         u.email,
         u.name as "name",
-        COUNT(ps.skill_id) as "matchCount",
-        (SELECT COUNT(*) FROM project_skills WHERE project_id IN (SELECT id FROM projects WHERE student_id = s.id)) as "totalStudentSkills",
-        COUNT(ps.skill_id)::decimal / NULLIF((SELECT COUNT(*) FROM publication_skills WHERE publication_id = ${publicationId}), 0) as "matchScore"
+        COUNT(DISTINCT ps.skill_id) as "matchCount",
+        (SELECT COUNT(DISTINCT skill_id) FROM project_skills WHERE project_id IN (SELECT id FROM projects WHERE student_id = s.id)) as "totalStudentSkills",
+        COUNT(DISTINCT ps.skill_id)::decimal / NULLIF((SELECT COUNT(*) FROM publication_skills WHERE publication_id = ${publicationId}), 0) as "matchScore"
       FROM
         students s
       LEFT JOIN

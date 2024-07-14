@@ -94,9 +94,9 @@ export class PublicationsRepositoryService {
         isAvailable: rec.is_available,
         createdAt: rec.created_at,
         updatedAt: rec.updated_at,
-        matchScore: rec.matchScore ? rec.matchScore.toString() : null,
-        matchCount: rec.matchCount ? rec.matchCount.toString() : null,
-        totalSkillsCount: rec.totalSkillsCount ? rec.totalSkillsCount.toString() : null,
+        matchScore: rec.matchScore ? Number(rec.matchScore.toString()) : null,
+        matchCount: rec.matchCount ? Number(rec.matchCount.toString()) : null,
+        totalSkillsCount: rec.totalSkillsCount ? Number(rec.totalSkillsCount.toString()) : null,
         business: {
           id: rec.businessId,
           name: rec.businessName,
