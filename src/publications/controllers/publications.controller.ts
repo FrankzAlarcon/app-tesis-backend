@@ -51,6 +51,14 @@ export class PublicationsController {
     return this.publicationsService.getLast();
   }
 
+  @Get('/last/:businessId')
+  @Roles(Role.STUDENT)
+  async getLastByBusinessId(
+    @Param('businessId') businessId: string
+  ) {
+    return this.publicationsService.getLastByBusiness(businessId);
+  }
+
   @Get(':publicationId')
   @Roles(Role.BUSINESS, Role.STUDENT)
   async getOne(

@@ -333,6 +333,37 @@ export class PublicationsService {
     return mappedPublications
   }
 
+  async getLastByBusiness(businessId: string) {
+    const publications = await this.prismaService.publication.findMany({
+      take: 2,
+      orderBy: { createdAt: 'desc' },
+      where: { businessId },
+      select: {
+        id: true,
+        title: true,
+        modality: true,
+        createdAt: true,
+        business: {
+          select: {
+            id: true,
+            name: true,
+            province: true,
+            imageUrl: true
+          }
+        }
+      }
+    })
+
+    const mappedPublications = await Promise.all(publications.map(async (publication) => {
+      if (publication.business.imageUrl) {
+        publication.business.imageUrl = await this.s3Service.getSignedUrlObject(publication.business.imageUrl)
+      }
+      return publication
+    }))
+
+    return mappedPublications
+  }
+
   async create(data: CreatePublicationDto, image: Express.Multer.File | undefined, businessId: string) {
     return this.prismaService.$transaction(async (tx) => {
       const { remuneration, notRegisteredSkills, skillsIds, ...rest } = data
