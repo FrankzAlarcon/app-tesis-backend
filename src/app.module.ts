@@ -9,6 +9,7 @@ import { FormsModule } from './forms/forms.module';
 import { PublicationsModule } from './publications/publications.module';
 import { PostulationsModule } from './postulations/postulations.module';
 import { PrinterModule } from './printer/printer.module';
+import { ChartsModule } from './charts/charts.module';
 import config from './config';
 
 @Module({
@@ -25,6 +26,7 @@ import config from './config';
     PublicationsModule,
     PostulationsModule,
     PrinterModule,
+    ChartsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
