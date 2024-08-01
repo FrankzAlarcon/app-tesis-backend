@@ -38,6 +38,18 @@ export class S3Service {
     return response
   }
 
+  async getObject({
+    filename,
+    bucket
+  }: { filename: string, bucket: string}) {
+    return this.s3Service.send(
+      new GetObjectCommand({
+        Bucket: bucket,
+        Key: filename
+      })
+    )
+  }
+
   async getFormObject({
     filename, status, bucket
   }: {filename: string, status: StudentFormBucket, bucket?: string}) {

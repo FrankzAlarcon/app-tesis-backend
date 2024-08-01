@@ -38,12 +38,9 @@ export class StudentFormController {
   @Get('/download/:studentFormId/:status')
   @Roles(Role.ADMIN, Role.STUDENT)
   async getPendingForms(
-    @Req() req: any,
     @Param('studentFormId') studentFormId: string,
     @Param('status') status: string
   ) {
-    const user = req.user as JwtPayload
-    console.log(user)
     const rta = await this.studenFormService.getStudentForm(studentFormId, status)
     const byteDocument = await rta.file.transformToByteArray()
     return new StreamableFile(byteDocument, {

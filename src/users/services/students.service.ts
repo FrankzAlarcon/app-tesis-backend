@@ -1,6 +1,6 @@
 import { AuthService } from '@/auth/services/auth.service';
 import { PrismaService } from '@/database/services/prisma.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { CompleteStudentProfileDto, CreateStudentDto } from '../dtos/student.dto';
 import { Role } from '@/global/enums/roles.enum';
 import { PublicationsService } from '@/publications/services/publications.service';
@@ -8,6 +8,8 @@ import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { ForumService } from '@/publications/services/forum.service';
 import { S3Service } from '@/database/services/s3.service';
 import { v4 as uuidv4 } from 'uuid';
+import config from '@/config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class StudentsService {
@@ -16,12 +18,29 @@ export class StudentsService {
     private readonly authService: AuthService,
     private readonly publicationsService: PublicationsService,
     private readonly forumService: ForumService,
-    private readonly s3Service: S3Service
+    private readonly s3Service: S3Service,
+    @Inject(config.KEY) private readonly configService: ConfigType<typeof config>
   ) {}
 
   async getFeed(studentId: string, params: PaginationQueryDto) {
     // TODO: get publications by student interests
     return this.publicationsService.getFeed(studentId, params)
+  }
+
+  async downloadCv(postulationId: string) {
+    const postulation = await this.prismaService.postulation.findFirst({
+      where: { id: postulationId },
+      select: { urlCV: true }
+    })
+
+    if (!postulation) {
+      throw new BadRequestException('Postulation not found')
+    }
+
+    return this.s3Service.getObject({
+      filename: postulation.urlCV,
+      bucket: this.configService.aws.cvBucket
+    })
   }
 
   async getBookmarks(studentId: string, params: PaginationQueryDto) {

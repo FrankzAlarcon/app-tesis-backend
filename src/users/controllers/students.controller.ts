@@ -10,6 +10,7 @@ import {
   Put,
   Query,
   Req,
+  StreamableFile,
   UploadedFile,
   UseGuards,
   UseInterceptors
@@ -91,6 +92,19 @@ export class StudentsController {
   ) {
     const user = req.user as JwtPayload
     return this.studentsService.getForums(user.studentId, params)
+  }
+
+  @Get('/download-cv/:postulationId')
+  @Roles(Role.STUDENT, Role.BUSINESS)
+  async downloadCv(
+    @Param('postulationId') postulationId: string
+  ) {
+    const rta = await this.studentsService.downloadCv(postulationId)
+    const byteDocument = await rta.Body.transformToByteArray()
+    return new StreamableFile(byteDocument, {
+      type: 'application/pdf',
+      disposition: 'attachment; filename=cv.pdf',
+    })
   }
 
   @Post()

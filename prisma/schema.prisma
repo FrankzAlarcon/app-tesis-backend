@@ -48,37 +48,41 @@ model Role {
   @@map("roles")
 }
 
-model Student {
+model  Student {
   id                String             @id @default(uuid())
   faculty           String?
   ira               String?
-  userId            String             @unique @map("user_id")
-  createdAt         DateTime           @default(now()) @map("created_at")
-  updatedAt         DateTime           @updatedAt @map("updated_at")
   description       String?
   shortPresentation String?            @map("short_presentation")
   imageUrl          String?            @map("image_url")
+  userId            String             @unique @map("user_id")
+
+  studentBookmarks  StudentBookmarks[]
   certifications    Certification[]
-  contracts         Contract?
-  curriculums       Curriculums?
+  projects          Project[]
+  studentForms      StudenForm[]
   forums            Forum[]
   postulations      Postulation[]
-  projects          Project[]
-  studentBookmarks  StudentBookmarks[]
-  studentForms      StudenForm[]
   user              User               @relation(fields: [userId], references: [id])
+  contracts         Contract?
+  curriculums       Curriculums?
+
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
 
   @@map("students")
 }
 
-model StudentBookmarks {
+model  StudentBookmarks {
   id            String      @id @default(uuid())
   studentId     String      @map("student_id")
   publicationId String      @map("publication_id")
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
+
   publication   Publication @relation(fields: [publicationId], references: [id])
   student       Student     @relation(fields: [studentId], references: [id])
+
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
 
   @@unique([studentId, publicationId])
   @@map("student_bookmarks")
@@ -90,19 +94,21 @@ model Business {
   code              String
   hasCovenant       Boolean           @default(false) @map("has_covenant")
   userId            String            @unique @map("user_id")
-  createdAt         DateTime          @default(now()) @map("created_at")
-  updatedAt         DateTime          @updatedAt @map("updated_at")
   city              String?
   description       String?
   phone             String?
   province          String?
   shortPresentation String?           @map("short_presentation")
   imageUrl          String?           @map("image_url")
+
   businessCovenants BusinessCovenant?
   user              User              @relation(fields: [userId], references: [id])
   contracts         Contract?
   forums            Forum[]
   publications      Publication[]
+
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
 
   @@map("businesses")
 }
@@ -112,9 +118,11 @@ model Covenant {
   name              String?
   description       String?
   type              String             @unique
+
+  businessCovenants BusinessCovenant[]
+
   createdAt         DateTime           @default(now()) @map("created_at")
   updatedAt         DateTime           @updatedAt @map("updated_at")
-  businessCovenants BusinessCovenant[]
 
   @@map("covenants")
 }
@@ -125,10 +133,12 @@ model BusinessCovenant {
   endDate    DateTime @map("end_date")
   businessId String   @unique @map("business_id")
   covenantId String   @map("covenant_id")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+
   business   Business @relation(fields: [businessId], references: [id])
   covenant   Covenant @relation(fields: [covenantId], references: [id])
+
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   @@map("business_covenants")
 }
@@ -141,10 +151,12 @@ model Contract {
   remuneration Decimal
   businessId   String   @unique @map("business_id")
   studentId    String   @unique @map("student_id")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+
   business     Business @relation(fields: [businessId], references: [id])
   student      Student  @relation(fields: [studentId], references: [id])
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("contracts")
 }
@@ -154,28 +166,32 @@ model Form {
   name         String?
   description  String?
   code         String       @unique
+
+  studentForms StudenForm[]
+
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
-  studentForms StudenForm[]
 
   @@map("forms")
 }
 
-model StudenForm {
+model  StudenForm {
   id            String        @id @default(uuid())
+  url           String        @unique
+  status        String
   startDate     DateTime      @map("start_date")
   approvalDate  DateTime?     @map("approval_date")
-  url           String        @unique
-  studentId     String        @map("student_id")
-  formId        String        @map("form_id")
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
-  status        String
   pendingDate   DateTime?     @map("pending_date")
   repprovalDate DateTime?     @map("repproval_date")
+  studentId     String        @map("student_id")
+  formId        String        @map("form_id")
+
   formContents  FormContent[]
   form          Form          @relation(fields: [formId], references: [id])
   student       Student       @relation(fields: [studentId], references: [id])
+
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
 
   @@map("student_forms")
 }
@@ -186,10 +202,12 @@ model Project {
   description   String?
   url           String
   studentId     String         @map("student_id")
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
+
   projectSkills ProjectSkill[]
   student       Student        @relation(fields: [studentId], references: [id])
+
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
 
   @@unique([name, studentId])
   @@map("projects")
@@ -199,10 +217,12 @@ model Skill {
   id                String             @id @default(uuid())
   name              String             @unique
   description       String?
-  createdAt         DateTime           @default(now()) @map("created_at")
-  updatedAt         DateTime           @updatedAt @map("updated_at")
+
   projectSkills     ProjectSkill[]
   publicationSkills PublicationSkill[]
+
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
 
   @@map("skills")
 }
@@ -211,10 +231,12 @@ model ProjectSkill {
   id        String   @id @default(uuid())
   projectId String   @map("project_id")
   skillId   String   @map("skill_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+
   project   Project  @relation(fields: [projectId], references: [id])
   skill     Skill    @relation(fields: [skillId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([projectId, skillId])
   @@map("project_skills")
@@ -228,9 +250,11 @@ model Certification {
   url             String
   issuingBusiness String   @map("issuing_business")
   studentId       String   @map("student_id")
+
+  student         Student  @relation(fields: [studentId], references: [id])
+
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
-  student         Student  @relation(fields: [studentId], references: [id])
 
   @@unique([name, studentId])
   @@map("certifications")
@@ -242,32 +266,36 @@ model Curriculums {
   description String?
   url         String
   studentId   String   @unique @map("student_id")
+
+  student     Student  @relation(fields: [studentId], references: [id])
+
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-  student     Student  @relation(fields: [studentId], references: [id])
 
   @@map("curriculums")
 }
 
 model Publication {
   id                String             @id @default(uuid())
+  title             String             @default("Sin título")
   description       String
+  benefits          String
+  requirements      String
   modality          String
   entryTime         String             @map("entry_time")
   departureTime     String             @map("departure_time")
-  benefits          String
-  requirements      String
-  createdAt         DateTime           @default(now()) @map("created_at")
-  updatedAt         DateTime           @updatedAt @map("updated_at")
-  businessId        String             @map("business_id")
   remuneration      Decimal?           @default(0)
-  title             String             @default("Sin título")
   imageUrl          String?
   isAvailable       Boolean            @default(true) @map("is_available")
+  businessId        String             @map("business_id")
+
   postulations      Postulation[]
   publicationSkills PublicationSkill[]
   business          Business           @relation(fields: [businessId], references: [id])
   studentBookmarks  StudentBookmarks[]
+
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
 
   @@map("publications")
 }
@@ -276,10 +304,12 @@ model PublicationSkill {
   id            String      @id @default(uuid())
   publicationId String      @map("publication_id")
   skillId       String      @map("skill_id")
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
+
   publication   Publication @relation(fields: [publicationId], references: [id])
   skill         Skill       @relation(fields: [skillId], references: [id])
+
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
 
   @@unique([publicationId, skillId])
   @@map("publication_skills")
@@ -291,26 +321,30 @@ model Forum {
   description String
   grade       Int
   studentId   String   @map("student_id")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
   businessId  String   @map("business_id")
+
   business    Business @relation(fields: [businessId], references: [id])
   student     Student  @relation(fields: [studentId], references: [id])
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("forums")
 }
 
-model Postulation {
+model  Postulation {
   id            String            @id @default(uuid())
   status        PostulationStatus
   message       String
   urlCV         String?           @map("url_cv")
   studentId     String            @map("student_id")
   publicationId String            @map("publication_id")
-  createdAt     DateTime          @default(now()) @map("created_at")
-  updatedAt     DateTime          @updatedAt @map("updated_at")
+
   publication   Publication       @relation(fields: [publicationId], references: [id])
   student       Student           @relation(fields: [studentId], references: [id])
+
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
 
   @@unique([studentId, publicationId])
   @@map("postulations")
@@ -318,9 +352,6 @@ model Postulation {
 
 model FormContent {
   id             String     @id @default(uuid())
-  studentFormId  String     @map("student_form_id")
-  createdAt      DateTime   @default(now()) @map("created_at")
-  updatedAt      DateTime   @updatedAt @map("updated_at")
   career         String?
   activitiesData Json?      @map("activities_data")
   businessData   Json?      @map("business_data")
@@ -330,7 +361,12 @@ model FormContent {
   signatureData  Json?      @map("signature_data")
   studentData    Json?      @map("student_data")
   subjectsData   Json?      @map("subjects_data")
+  studentFormId  String     @map("student_form_id")
+
   studentForm    StudenForm @relation(fields: [studentFormId], references: [id])
+
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
 
   @@map("form_contents")
 }
@@ -340,9 +376,11 @@ model Subject {
   name            String          @unique
   code            String          @unique
   description     String?
+
+  careersSubjects SubjectCareer[]
+
   createdAt       DateTime        @default(now()) @map("created_at")
   updatedAt       DateTime        @updatedAt @map("updated_at")
-  careersSubjects SubjectCareer[]
 
   @@map("subjects")
 }
@@ -351,9 +389,11 @@ model Career {
   id              String          @id @default(uuid())
   name            String          @unique
   description     String?
+
+  careersSubjects SubjectCareer[]
+
   createdAt       DateTime        @default(now()) @map("created_at")
   updatedAt       DateTime        @updatedAt @map("updated_at")
-  careersSubjects SubjectCareer[]
 
   @@map("careers")
 }
@@ -363,10 +403,12 @@ model SubjectCareer {
   subjectId String   @map("subject_id")
   careerId  String   @map("career_id")
   semester  Int
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+
   career    Career   @relation(fields: [careerId], references: [id])
   subject   Subject  @relation(fields: [subjectId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("subject_careers")
 }
