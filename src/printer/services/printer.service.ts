@@ -13,6 +13,13 @@ const fonts = {
 export class PrinterService {
   private printer = new PdfPrinter(fonts)
 
+  createDashboardReportPdf(
+    documentDefinition: TDocumentDefinitions,
+    options: BufferOptions = {}
+  ): PDFKit.PDFDocument {
+    return this.printer.createPdfKitDocument(documentDefinition, options)
+  }
+
   createFaa199FormPdf(
     documentDefinition: TDocumentDefinitions,
     options: BufferOptions = {}
