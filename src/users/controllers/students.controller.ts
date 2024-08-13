@@ -17,7 +17,7 @@ import {
 } from '@nestjs/common';
 import { StudentsService } from '../services/students.service';
 import { CompleteStudentProfileDto, CreateStudentDto } from '../dtos/student.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
 import { AuthGuard } from '@/global/guards/auth.guard';
@@ -26,6 +26,7 @@ import { ProfileService } from '../services/student-profile/profile.service';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+@ApiBearerAuth()
 @ApiTags('Students')
 @UseGuards(AuthGuard)
 @Controller('students')

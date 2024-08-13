@@ -1,12 +1,13 @@
 import { Body, Controller, Delete, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { BookmarksService } from '../services/bookmarks.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { CreateBookmarkDto } from '../dtos/bookmarks.dto';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
 import { JwtPayload } from '@/global/interfaces/jwt.interface';
 
+@ApiBearerAuth()
 @ApiTags('Bookmarks')
 @UseGuards(AuthGuard)
 @Controller('bookmarks')

@@ -10,13 +10,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { StudentFormService } from '../services/student-form.service';
 import { GetStudentInfoByFormDto } from '../dtos/forms.dto';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
 import { Response } from 'express';
 import { JwtPayload } from '@/global/interfaces/jwt.interface';
 
+@ApiBearerAuth()
 @ApiTags('Student Forms')
 @UseGuards(AuthGuard)
 @Controller('student-form')

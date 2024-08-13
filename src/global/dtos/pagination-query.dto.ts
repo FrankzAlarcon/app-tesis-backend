@@ -11,27 +11,27 @@ export class PaginationQueryDto {
   // @IsPositive()
   @Min(0)
   @IsOptional()
-  limit: number
+  limit?: number
 
   @IsNumber()
   // @IsPositive()
   @Min(0)
   @IsOptional()
-  offset: number
+  offset?: number
 
   @IsString()
   @IsOptional()
-  filterField: string
+  filterField?: string
 
   @IsString()
   @IsOptional()
-  filterValue: string
+  filterValue?: string
 
   @IsString()
   @IsOptional()
-  orderField: string
+  orderField?: string
 
   @IsString()
   @IsOptional()
-  orderDirection: 'asc' | 'desc'
+  orderDirection?: 'asc' | 'desc'
 }

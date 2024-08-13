@@ -6,7 +6,7 @@ import { AuthGuard } from '@/global/guards/auth.guard';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
 import { CreateBusinessDto } from '@/users/dtos/business.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -37,6 +37,7 @@ export class AuthController {
     return this.authService.registerBusiness(data)
   }
 
+  @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard)
   @Post('/register-admin')
@@ -46,6 +47,7 @@ export class AuthController {
     return this.authService.registerAdmin(data)
   }
 
+  @ApiBearerAuth()
   @Post('/is-logged-in')
   @UseGuards(AuthGuard)
   @Roles(Role.ADMIN, Role.STUDENT, Role.BUSINESS)

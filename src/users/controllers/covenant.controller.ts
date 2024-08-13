@@ -1,10 +1,11 @@
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CovenantService } from '../services/covenant.service';
 import { CreateCovenantDto } from '../dtos/covenant.dto';
 
+@ApiBearerAuth()
 @ApiTags('Covenant')
 @Roles(Role.ADMIN)
 @Controller('covenant')

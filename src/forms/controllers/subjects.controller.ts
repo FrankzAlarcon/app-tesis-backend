@@ -1,11 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { SubjectsService } from '../services/subjects.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { Roles } from '@/global/decorators/role.decorator';
 import { CreateSubjectDto } from '../dtos/subject.dto';
 import { Role } from '@/global/enums/roles.enum';
 
+@ApiBearerAuth()
 @ApiTags('Subjects')
 @UseGuards(AuthGuard)
 @Controller('subjects')

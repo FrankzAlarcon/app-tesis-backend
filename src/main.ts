@@ -30,6 +30,7 @@ async function bootstrap() {
     .setTitle('App Comisión de Pasantías de la EPN')
     .setDescription('API para la comisión de pasantías de la EPN')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

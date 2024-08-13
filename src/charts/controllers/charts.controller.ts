@@ -1,8 +1,9 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ChartsService } from '../services/charts.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/global/guards/auth.guard';
 
+@ApiBearerAuth()
 @ApiTags('Charts')
 @Controller('charts')
 @UseGuards(AuthGuard)

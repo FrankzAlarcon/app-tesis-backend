@@ -5,8 +5,9 @@ import { JwtPayload } from '@/global/interfaces/jwt.interface';
 import { CreateCertificationDto } from '@/users/dtos/certifications.dto';
 import { CertificationsService } from '@/users/services/student-profile/certifications.service';
 import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @ApiTags('Certifications') 
 @UseGuards(AuthGuard)
 @Controller('certifications')

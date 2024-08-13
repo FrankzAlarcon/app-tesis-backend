@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Get, Param, Put, Query, Req, Upl
 import { BusinessService } from '../services/business.service';
 // import { CreateBusinessDto } from '../dtos/business.dto';
 import { AuthGuard } from '@/global/guards/auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
 import { CompleteProfileDto } from '../dtos/business.dto';
@@ -10,6 +10,8 @@ import { JwtPayload } from '@/global/interfaces/jwt.interface';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+
+@ApiBearerAuth()
 @ApiTags('Business')
 @Controller('business')
 @UseGuards(AuthGuard)

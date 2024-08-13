@@ -1,6 +1,6 @@
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { Body, Controller, Delete, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ForumService } from '../services/forum.service';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
@@ -8,6 +8,7 @@ import { JwtPayload } from '@/global/interfaces/jwt.interface';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { CreateForumDto } from '../dtos/forum.dto';
 
+@ApiBearerAuth()
 @ApiTags('Forum')
 @UseGuards(AuthGuard)
 @Controller('forum')

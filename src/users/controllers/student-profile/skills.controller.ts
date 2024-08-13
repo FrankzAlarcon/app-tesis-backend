@@ -4,8 +4,9 @@ import { AuthGuard } from '@/global/guards/auth.guard';
 import { CreateSkillDto } from '@/users/dtos/skills.dto';
 import { SkillsService } from '@/users/services/student-profile/skills.service';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @ApiTags('Skills') 
 @UseGuards(AuthGuard)
 @Controller('skills')

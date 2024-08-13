@@ -1,11 +1,12 @@
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CareersService } from '../services/careers.service';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
 import { CreateCareerDto } from '../dtos/career.dto';
 
+@ApiBearerAuth()
 @ApiTags('Careers')
 @UseGuards(AuthGuard)
 @Controller('careers')

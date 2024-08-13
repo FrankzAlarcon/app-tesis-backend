@@ -4,8 +4,9 @@ import { AuthGuard } from '@/global/guards/auth.guard';
 import { CreateProjectDto } from '@/users/dtos/projects.dto';
 import { ProjectsService } from '@/users/services/student-profile/projects.service';
 import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @ApiTags('Projects') 
 @UseGuards(AuthGuard)
 @Controller('projects')

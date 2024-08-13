@@ -4,7 +4,7 @@ import { Body,
   UseGuards, UseInterceptors
 } from '@nestjs/common';
 import { PostulationsService } from '../services/postulations.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
@@ -13,6 +13,7 @@ import { JwtPayload } from '@/global/interfaces/jwt.interface';
 import { CreatePostulationDto } from '../dtos/postulations.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+@ApiBearerAuth()
 @ApiTags('Postulations')
 @UseGuards(AuthGuard)
 @Controller('postulations')

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FormsService } from '../services/forms.service';
 import { CreateFormDto } from '../dtos/forms.dto';
 import { Roles } from '@/global/decorators/role.decorator';
@@ -8,6 +8,7 @@ import { AuthGuard } from '@/global/guards/auth.guard';
 import { Response } from 'express';
 import { FormContentDto } from '../dtos/form-content.dto';
 
+@ApiBearerAuth()
 @ApiTags('Forms')
 @UseGuards(AuthGuard)
 @Controller('forms')

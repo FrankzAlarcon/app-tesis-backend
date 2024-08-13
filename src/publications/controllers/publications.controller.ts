@@ -19,11 +19,12 @@ import { Roles } from '@/global/decorators/role.decorator';
 import { Role } from '@/global/enums/roles.enum';
 import { JwtPayload } from '@/global/interfaces/jwt.interface';
 import { CreatePublicationDto } from '../dtos/publications.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/global/guards/auth.guard';
 import { PaginationQueryDto } from '@/global/dtos/pagination-query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+@ApiBearerAuth()
 @ApiTags('Publications')
 @UseGuards(AuthGuard)
 @Controller('publications')
